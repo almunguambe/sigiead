@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Gabinete Provincial - Assembleia de Deus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-6 font-sans text-slate-800 text-xs">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <div class="bg-indigo-950 text-white p-6 rounded-3xl shadow flex justify-between items-center">
+            <div>
+                <span class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                    Superintendência Provincial
+                </span>
+                <h1 class="text-2xl font-black mt-1">Província de {{ provincia }}</h1>
+                <p class="text-xs text-indigo-200">Consolidação Estatística de Todos os Distritos</p>
+            </div>
+            <a href="/logout" class="px-4 py-2 bg-rose-600 text-white font-bold rounded-xl shadow">Sair</a>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">TOTAL DE MEMBROS</span>
+                <span class="text-3xl font-black text-indigo-950">{{ totais.membros }}</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">NOVAS CONVERSÕES</span>
+                <span class="text-3xl font-black text-emerald-700">{{ totais.convertidos }}</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">CASAMENTOS NO ANO</span>
+                <span class="text-3xl font-black text-pink-700">{{ totais.casamentos }}</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">ÓBITOS NO ANO</span>
+                <span class="text-3xl font-black text-slate-600">{{ totais.obitos }}</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

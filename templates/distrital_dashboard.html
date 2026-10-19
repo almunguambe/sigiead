@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Gabinete Distrital - Assembleia de Deus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 p-6 font-sans text-slate-800 text-xs">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <div class="bg-slate-900 text-white p-6 rounded-3xl shadow flex justify-between items-center">
+            <div>
+                <span class="bg-amber-400 text-slate-950 px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                    Direcção Distrital
+                </span>
+                <h1 class="text-2xl font-black mt-1">Distrito de {{ distrito }}</h1>
+                <p class="text-xs text-slate-300">Relatório Compilado de todas as congregações da Assembleia de Deus neste distrito</p>
+            </div>
+            <a href="/logout" class="px-4 py-2 bg-rose-600 text-white font-bold rounded-xl shadow">Sair</a>
+        </div>
+
+        <!-- TOTAIS AGREGADOS DO DISTRITO -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">MEMBROS NO DISTRITO</span>
+                <span class="text-2xl font-black text-indigo-950">{{ totais.membros }}</span>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">NOVOS CONVERTIDOS</span>
+                <span class="text-2xl font-black text-emerald-700">{{ totais.convertidos }}</span>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">CASAMENTOS NO ANO</span>
+                <span class="text-2xl font-black text-pink-700">{{ totais.casamentos }}</span>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">ÓBITOS NO ANO</span>
+                <span class="text-2xl font-black text-slate-600">{{ totais.obitos }}</span>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow border text-center">
+                <span class="text-slate-400 font-bold block text-[10px]">CULTOS REALIZADOS</span>
+                <span class="text-2xl font-black text-blue-700">{{ totais.cultos }}</span>
+            </div>
+        </div>
+
+        <!-- LISTA DAS CONGREGAÇÕES SUBORDINADAS -->
+        <div class="bg-white p-6 rounded-3xl shadow border space-y-3">
+            <h2 class="font-extrabold text-sm uppercase text-slate-900 border-b pb-2">Congregações Jurisdicionadas ({{ congregações|length }})</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {% for c in congregações %}
+                <div class="p-3 bg-slate-50 border rounded-xl flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-900 block">{{ c.nome }}</span>
+                        <span class="text-[10px] text-slate-500">Bairro: {{ c.bairro }} • Pastor: {{ c.pastor_responsavel }}</span>
+                    </div>
+                    <span class="bg-indigo-100 text-indigo-900 px-2 py-1 rounded-lg font-black text-[10px]">Ativa</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

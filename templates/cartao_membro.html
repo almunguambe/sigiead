@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartão Oficial de Membro - {{ m.nome }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            @page { size: A4 portrait; margin: 15mm; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 p-6 font-sans text-slate-800 flex flex-col items-center justify-center min-h-screen">
+
+    <div class="no-print mb-6 flex gap-4">
+        <button onclick="window.print()" class="px-6 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-xl shadow cursor-pointer text-xs">
+            🖨️ Imprimir Cartão (Frente e Verso)
+        </button>
+        <button onclick="window.close()" class="px-4 py-2.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold rounded-xl text-xs">
+            Fechar
+        </button>
+    </div>
+
+    <!-- CARTÃO FRENTE E VERSO LADO A LADO -->
+    <div class="flex flex-col md:flex-row gap-6 items-center">
+
+        <!-- FRENTE DO CARTÃO -->
+        <div class="w-[340px] h-[215px] bg-white rounded-2xl shadow-xl border-2 border-slate-300 p-3.5 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2.5 bg-gradient-to-r from-blue-700 via-amber-500 to-blue-700"></div>
+
+            <div class="flex items-center gap-2.5 border-b border-slate-200 pb-2 pt-1">
+                <div class="w-12 h-12 shrink-0 flex items-center justify-center">
+                    {% include 'logo_ad.html' %}
+                </div>
+                <div class="leading-tight overflow-hidden">
+                    <span class="text-[8px] font-black uppercase tracking-wider text-blue-900 block truncate">IGREJA EVANGÉLICA</span>
+                    <h1 class="text-[11px] font-black uppercase text-slate-900 truncate">ASSEMBLEIA DE DEUS</h1>
+                    <span class="text-[8px] text-amber-700 font-bold block truncate">{{ congregacao.nome }} • {{ congregacao.distrito }}</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 items-center my-auto">
+                                <div class="w-16 h-20 bg-slate-100 border border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-400 shrink-0 overflow-hidden shadow-inner">
+                    {% if m.foto %}
+                    <img src="{{ m.foto }}" alt="{{ m.nome }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <span class="text-2xl">👤</span>
+                    <span class="text-[7px] uppercase font-bold">Sem Foto</span>
+                    {% endif %}
+                </div>
+                <div class="space-y-1 overflow-hidden leading-tight text-[10px]">
+                    <div>
+                        <span class="text-[7px] text-slate-400 font-bold uppercase block">Nome do Membro:</span>
+                        <span class="font-extrabold text-slate-900 block truncate text-[11px]">{{ m.nome }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <span class="text-[7px] text-slate-400 font-bold uppercase block">Cargo:</span>
+                            <span class="font-bold text-blue-900 block truncate">{{ m.cargo or 'Membro' }}</span>
+                        </div>
+                        <div>
+                            <span class="text-[7px] text-slate-400 font-bold uppercase block">Estado Civil:</span>
+                            <span class="font-bold text-slate-800 block truncate">{{ m.estado_civil or '---' }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[7px] text-slate-400 font-bold uppercase block">Zona / Célula:</span>
+                        <span class="font-bold text-slate-700 block truncate">{{ m.zona or 'Zona Central' }} • {{ m.celula or 'Betel' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-slate-200 pt-1 text-[8px] text-slate-500 font-semibold">
+                <span>Nº Ficha: #{{ "%04d"|format(m.id) }}</span>
+                <span class="text-blue-900 font-bold">MOÇAMBIQUE</span>
+                <span>Validade: {{ agora_ano + 2 }}</span>
+            </div>
+        </div>
+
+        <!-- VERSO DO CARTÃO -->
+        <div class="w-[340px] h-[215px] bg-white rounded-2xl shadow-xl border-2 border-slate-300 p-3.5 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2.5 bg-gradient-to-r from-blue-700 via-amber-500 to-blue-700"></div>
+
+            <div class="text-center pt-1 border-b border-slate-200 pb-1.5">
+                <span class="text-[9px] font-black uppercase text-slate-900 block">CREDENCIAL OFICIAL DE MEMBRESIA</span>
+                <p class="text-[7.5px] italic text-slate-500">"Quando orardes, lembrai-vos de Moçambique!"</p>
+            </div>
+
+            <div class="space-y-1.5 text-[9px] text-slate-700 leading-tight">
+                <div class="flex justify-between border-b border-slate-100 pb-0.5">
+                    <span class="font-bold text-slate-500">Documento BI:</span>
+                    <span class="font-bold">{{ m.bi or 'Declarado em Registo' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-0.5">
+                    <span class="font-bold text-slate-500">Data de Baptismo:</span>
+                    <span class="font-bold text-blue-900">{{ m.data_batismo or '---' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-0.5">
+                    <span class="font-bold text-slate-500">Departamento:</span>
+                    <span class="font-bold">{{ m.departamento or 'Geral' }}</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-0.5">
+                    <span class="font-bold text-slate-500">Congregação Local:</span>
+                    <span class="font-bold">{{ congregacao.nome }}</span>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-between items-end border-t border-slate-200">
+                <div class="text-center w-28">
+                    <div class="border-b border-slate-400 w-full mb-0.5"></div>
+                    <span class="text-[7px] uppercase font-bold text-slate-500 block">Assinatura do Portador</span>
+                </div>
+                <div class="text-center w-32">
+                    <div class="border-b border-slate-400 w-full mb-0.5"></div>
+                    <span class="text-[7px] uppercase font-bold text-slate-700 block">O Pastor Presidente</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

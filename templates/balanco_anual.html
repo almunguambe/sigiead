@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanço Anual & Questionamentos - IEAD Chicuque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-6">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- CABEÇALHO -->
+        <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="inline-flex items-center gap-2 bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-[10px] font-black uppercase mb-1 border border-indigo-400/30">
+                    <span>🎯</span> GABINETE DA SECRETARIA • BALANÇO DE ENCERRAMENTO MINISTERIAL
+                </div>
+                <h1 class="text-2xl font-black">Balanço Anual & Questionamento de Metas ({{ ano_sel }})</h1>
+                <p class="text-xs text-slate-400 mt-1">
+                    Avalie o que foi realizado em cada actividade planificada e consolide os constrangimentos e perspectivas para o Relatório Oficial.
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/?aba=secretaria" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold shadow">
+                    ← Voltar à Secretaria
+                </a>
+                <a href="/secretaria/relatorio-anual" target="_blank" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs shadow flex items-center gap-1.5">
+                    <span>📄</span><span>Ver Relatório Oficial</span>
+                </a>
+            </div>
+        </div>
+
+        <form action="/secretaria/balanco" method="POST" class="space-y-6 text-xs">
+            <input type="hidden" name="ano_exercicio" value="{{ ano_sel }}">
+
+            <!-- 1. MATRIZ DE QUESTIONAMENTOS AUTOMÁTICOS POR ACTIVIDADE -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
+                <div class="border-b pb-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <span>📋</span> 1. Questionamento Automático por Actividade Planificada
+                        </h2>
+                        <p class="text-[11px] text-slate-500">O sistema gerou automaticamente este formulário para cada actividade registada na planificação.</p>
+                    </div>
+                    <span class="bg-indigo-100 text-indigo-900 px-3 py-1 rounded-full font-black text-xs">Total: {{ planos|length }} Actividades</span>
+                </div>
+
+                <div class="space-y-4">
+                    {% for p in planos %}
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                            <div>
+                                <span class="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded font-bold uppercase">{{ p.departamento }}</span>
+                                <span class="font-extrabold text-slate-900 text-sm ml-2">{{ p.actividade }}</span>
+                                <span class="text-[11px] text-slate-400 block sm:inline sm:ml-2">Data: {{ p.data_prevista }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="font-bold text-slate-600 text-[11px]">Situação:</label>
+                                <select name="status_{{ p.id }}" class="h-8 px-2 border rounded-lg bg-white font-bold text-xs">
+                                    <option value="Executado" {% if p.status == 'Executado' %}selected{% endif %}>✅ Executado</option>
+                                    <option value="Parcial" {% if p.status == 'Parcial' %}selected{% endif %}>⚠️ Parcialmente Executado</option>
+                                    <option value="Não Realizado" {% if p.status == 'Não Realizado' %}selected{% endif %}>❌ Não Realizado</option>
+                                    <option value="Planeado" {% if p.status == 'Planeado' %}selected{% endif %}>⏳ Planeado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- PERGUNTAS ESPECÍFICAS DA ACTIVIDADE -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-rose-900 mb-1">
+                                    ❓ Quais foram os constrangimentos e dificuldades nesta actividade?
+                                </label>
+                                <textarea name="dificuldades_{{ p.id }}" rows="2" placeholder="Ex: Falta de meios de transporte, chuva torrencial, falta de material didáctico..." class="w-full p-2.5 border rounded-xl bg-white font-medium">{{ p.dificuldades or '' }}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-emerald-900 mb-1">
+                                    🚀 Quais são as perspectivas e lições para o ano seguinte?
+                                </label>
+                                <textarea name="perspectivas_{{ p.id }}" rows="2" placeholder="Ex: Antecipar a recolha de fundos, realizar em dois turnos, adquirir equipamento próprio..." class="w-full p-2.5 border rounded-xl bg-white font-medium">{{ p.perspectivas or '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- FEEDBACK E PARTICIPAÇÃO REAL POR GÉNERO -->
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-5 gap-2 items-center">
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] text-slate-500 font-bold mb-0.5">Resumo / Feedback do que foi feito:</label>
+                                <input type="text" name="feedback_{{ p.id }}" value="{{ p.feedback or '' }}" placeholder="Breve nota de realização..." class="w-full h-8 px-2 border rounded-lg bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-bold">Homens</label>
+                                <input type="number" name="part_h_{{ p.id }}" value="{{ p.participantes_homens or 0 }}" min="0" class="w-full h-8 px-2 border rounded text-center font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-bold">Mulheres</label>
+                                <input type="number" name="part_m_{{ p.id }}" value="{{ p.participantes_mulheres or 0 }}" min="0" class="w-full h-8 px-2 border rounded text-center font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-500 font-bold">Jovens / Crianças</label>
+                                <input type="number" name="part_j_{{ p.id }}" value="{{ (p.participantes_jovens or 0) + (p.participantes_criancas or 0) }}" min="0" class="w-full h-8 px-2 border rounded text-center font-bold">
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-center text-slate-400 py-6 italic">Nenhuma actividade registada no cronograma de planificação.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 2. CONSTRANGIMENTOS GERAIS DA IGREJA (ALIMENTA A SEÇÃO 8 DO RELATÓRIO) -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
+                <div class="border-b pb-2">
+                    <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <span>⚠️</span> 2. Constrangimentos / Dificuldades Gerais da Igreja (Seção 8 do Relatório Oficial)
+                    </h2>
+                    <p class="text-[11px] text-slate-500">Defina os principais constrangimentos institucionais para saírem impressos no relatório final:</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Constrangimento 1:</label>
+                        <input type="text" name="constrangimento_1" value="{{ balanco.constrangimento_1 if balanco else 'Necessidade premente de reabilitação e melhoria das infraestruturas dos locais de culto.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Constrangimento 2:</label>
+                        <input type="text" name="constrangimento_2" value="{{ balanco.constrangimento_2 if balanco else 'Limitação de recursos e meios de locomoção para assistência pastoral regular a congregações periféricas.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Constrangimento 3:</label>
+                        <input type="text" name="constrangimento_3" value="{{ balanco.constrangimento_3 if balanco else 'Escassez de material didáctico, bíblias e manuais de apoio para o discipulado e departamentos infantojuvenis.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PERSPECTIVAS E PLANOS PARA O ANO SEGUINTE (ALIMENTA A SEÇÃO 9 DO RELATÓRIO) -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-4">
+                <div class="border-b pb-2">
+                    <h2 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                        <span>🚀</span> 3. Perspectivas / Planos para o Ano Seguinte (Seção 9 do Relatório Oficial)
+                    </h2>
+                    <p class="text-[11px] text-slate-500">Defina as grandes metas e prioridades ministeriais para o ano subsequente:</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Perspectiva / Meta 1:</label>
+                        <input type="text" name="perspectiva_1" value="{{ balanco.perspectiva_1 if balanco else 'Intensificar o plano de evangelização e missões para a conquista de novas almas e plantação de congregações.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Perspectiva / Meta 2:</label>
+                        <input type="text" name="perspectiva_2" value="{{ balanco.perspectiva_2 if balanco else 'Realizar cerimónias solenes de baptismo nas águas para os novos convertidos e jovens preparados na doutrina.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Perspectiva / Meta 3:</label>
+                        <input type="text" name="perspectiva_3" value="{{ balanco.perspectiva_3 if balanco else 'Promover cursos contínuos de capacitação bíblico-doutrinária para diáconos, diaconisas e obreiros.' }}" class="w-full h-10 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-medium">
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTÃO DE GRAVAÇÃO -->
+            <button type="submit" class="w-full py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-2xl shadow-xl cursor-pointer text-sm transition flex items-center justify-center gap-2">
+                <span>💾</span><span>Gravar Balanço Anual & Actualizar Relatório Oficial 2026</span>
+            </button>
+        </form>
+
+    </div>
+</body>
+</html>

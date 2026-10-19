@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Aluno - IEAD Moçambique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-bg { background: linear-gradient(135deg, #090d16 0%, #1e1b4b 60%, #312e81 100%); }
+        table, th, td { border: 1px solid #cbd5e1 !important; }
+    </style>
+    <!-- PWA MOBILE CONFIGURAÇÃO -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIGIEAD">
+    <link rel="apple-touch-icon" href="/static/img/logo.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SIGIEAD App registado com sucesso!');
+                }).catch(err => {
+                    console.log('Falha ao registar Service Worker PWA:', err);
+                });
+            });
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center shadow-lg border-b border-indigo-900 sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-amber-400 flex items-center justify-center font-black text-xl shadow">
+                AD
+            </div>
+            <div>
+                <h1 class="font-black text-sm uppercase tracking-wider">ESCOLA DE INTEGRAÇÃO & DOUTRINA</h1>
+                <p class="text-[11px] text-amber-300 font-bold">Assembleia de Deus • Sede Regional de Chicuque</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs">
+            <div class="text-right">
+                <span class="text-[10px] text-slate-400 block uppercase font-bold">Aluno Conectado</span>
+                <span class="font-extrabold text-white">{{ aluno.nome_aluno }}</span>
+            </div>
+            <a href="/logout" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-1.5 rounded-xl font-bold shadow text-xs transition">
+                Sair
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+        <div class="card-bg text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <span class="bg-amber-400 text-slate-950 text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
+                    Plataforma Oficial de Formação Ministerial
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black">
+                    Graça e Paz, {{ aluno.nome_aluno }}!
+                </h2>
+                <p class="text-xs sm:text-sm text-indigo-200 max-w-2xl leading-relaxed">
+                    Você está estudando o <b>Manual Oficial de Candidatos e Integração da IEADAO</b> na íntegra. Leia com atenção as notas explicativas, elabore o seu resumo e responda ao teste teológico.
+                </p>
+            </div>
+
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-3xl text-center shrink-0 w-full lg:w-72 space-y-3">
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-indigo-200 block">Aproveitamento Curricular</span>
+                    <div class="text-3xl font-black mt-0.5 text-amber-300">
+                        {{ "%.1f"|format(aluno.aproveitamento or 0) }}%
+                    </div>
+                    <div class="w-full bg-slate-900/60 h-2 rounded-full overflow-hidden my-2 border border-white/10">
+                        <div class="bg-emerald-400 h-full rounded-full transition-all duration-700" style="width: {{ [aluno.aproveitamento or 0, 100]|min }}%"></div>
+                    </div>
+                </div>
+
+                <div class="border-t border-white/10 pt-2 text-left bg-white/5 p-2.5 rounded-xl">
+                    <span class="text-[9px] uppercase font-bold text-amber-300 block">👨‍🏫 Instrutor / Pai na Fé</span>
+                    <span class="text-xs font-black text-white block truncate">{{ aluno.professor or "Pastor Dirigente" }}</span>
+                    <span class="text-[10px] text-indigo-200 block mt-0.5">{{ aluno.classe }}</span>
+                </div>
+
+                {% if todas_concluidas %}
+                <a href="/ensino/exame_final" class="block w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs shadow transition">
+                    🏆 Fazer Exame Final & Obter Certificado
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if request.args.get('sucesso_aprovado') %}
+        <div class="bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between text-emerald-900 text-xs font-bold shadow">
+            <span>🎉 Glória a Deus! Concluiu a lição anterior com aproveitamento maior ou igual a 70%! A lição seguinte foi destravada para o seu estudo!</span>
+        </div>
+        {% endif %}
+
+        {% if request.args.get('nota_resultado') %}
+        <div class="bg-amber-50 border-2 border-amber-400 p-4 rounded-2xl flex items-center justify-between text-amber-900 text-xs font-bold shadow">
+            <span>⚠️ Atingiu {{ request.args.get('nota_resultado') }}%. É necessário no mínimo 70% para destrancar a próxima lição. Reveja os tópicos e repita o teste abaixo.</span>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- COLUNA ESQUERDA: LISTA DE CLASSES E LIÇÕES -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-extrabold text-sm uppercase text-slate-900 mb-3 border-b pb-2 flex items-center gap-2">
+                        <span>📚</span> Currículo Oficial por Classes
+                    </h3>
+
+                    <div class="space-y-4">
+                        {% for classe in curriculo %}
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <div class="font-black text-xs text-indigo-950 uppercase mb-1">
+                                {{ classe.nome_classe }}
+                            </div>
+                            <p class="text-[10px] text-slate-500 mb-2.5">{{ classe.descricao }}</p>
+
+                            <div class="space-y-1.5">
+                                {% for l in classe.licoes %}
+                                {% set st = licoes_status[l.id] %}
+                                
+                                {% if st.status == 'concluida' %}
+                                <a href="/ensino/aulas?licao={{ l.id }}" class="flex items-center justify-between p-2 rounded-lg text-xs font-bold transition {% if licao.id == l.id %}bg-indigo-600 text-white{% else %}bg-emerald-50 text-emerald-900 hover:bg-emerald-100{% endif %}">
+                                    <span class="truncate">✅ {{ l.numero }}: {{ l.titulo }}</span>
+                                    <span class="text-[10px] bg-emerald-200 text-emerald-950 px-2 py-0.5 rounded-full font-black ml-1">{{ st.nota }}%</span>
+                                </a>
+                                {% elif st.status == 'em_estudo' %}
+                                <a href="/ensino/aulas?licao={{ l.id }}" class="flex items-center justify-between p-2 rounded-lg text-xs font-bold transition {% if licao.id == l.id %}bg-indigo-600 text-white shadow-md{% else %}bg-blue-100 text-blue-900 border border-blue-300 hover:bg-blue-200{% endif %}">
+                                    <span class="truncate">📖 {{ l.numero }}: {{ l.titulo }}</span>
+                                    <span class="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-black ml-1">EM ESTUDO</span>
+                                </a>
+                                {% else %}
+                                <div class="flex items-center justify-between p-2 rounded-lg text-xs text-slate-400 bg-slate-100 cursor-not-allowed">
+                                    <span class="truncate">🔒 {{ l.numero }}: {{ l.titulo }}</span>
+                                    <span class="text-[10px] text-slate-400">Trancada</span>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA DIREITA: CONTEÚDO PROFUNDO COM NOTAS EXPLICATIVAS -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <span class="text-xs font-black uppercase text-indigo-600 tracking-wider">
+                            ETAPA 1: ESTUDO DOUTRINÁRIO PROFUNDO (MANUAL DA IEADAO)
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">{{ licao.numero }}: {{ licao.titulo }}</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Leitura Bíblica de Apoio: <b>{{ licao.leitura_base }}</b></p>
+                    </div>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-2xl">
+                        <span class="text-[10px] font-black uppercase text-amber-900 block mb-1">🔥 Texto Áureo da Lição</span>
+                        <p class="text-sm italic text-amber-950 font-serif leading-relaxed">"{{ licao.texto_aureo }}"</p>
+                    </div>
+
+                    <div class="text-xs text-slate-700 leading-relaxed text-justify bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <p class="font-bold text-slate-900 mb-1">Prefácio Temático:</p>
+                        <p>{{ licao.conteudo_completo.introducao }}</p>
+                    </div>
+
+                    <!-- PONTOS DOUTRINÁRIOS COM NOTAS EXPLICATIVAS -->
+                    <div class="space-y-4 text-xs">
+                        {% for pt in licao.conteudo_completo.pontos_doutrinarios %}
+                        <div class="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3">
+                            <h4 class="font-black text-sm text-indigo-950 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span> {{ pt.titulo }}
+                            </h4>
+
+                            {% if pt.detalhes %}
+                            <p class="text-slate-700 leading-relaxed text-justify whitespace-pre-line">{{ pt.detalhes }}</p>
+                            {% endif %}
+
+                            <!-- CAIXA DOURADA: NOTA EXPLICATIVA & ORIENTAÇÃO PASTORAL -->
+                            {% if pt.nota_explicativa %}
+                            <div class="bg-amber-50/90 border-l-4 border-amber-500 p-4 rounded-r-2xl space-y-1.5 text-slate-800 shadow-sm">
+                                <span class="font-black text-[11px] uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+                                    <span>💡</span> Nota Explicativa & Orientação Pastoral:
+                                </span>
+                                <p class="text-xs text-amber-950 leading-relaxed whitespace-pre-line text-justify font-medium">
+                                    {{ pt.nota_explicativa }}
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            {% if pt.tabela %}
+                            <div class="overflow-x-auto pt-2">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-100 font-bold uppercase text-[10px]">
+                                            <th class="p-2 w-1/4">Situação</th>
+                                            <th class="p-2">Descrição Espiritual</th>
+                                            <th class="p-2 w-1/4">Versículos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for l in pt.tabela %}
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="p-2 font-bold text-rose-900">{{ l.situacao }}</td>
+                                            <td class="p-2 text-slate-700">{{ l.descricao }}</td>
+                                            <td class="p-2 font-semibold text-indigo-900">{{ l.versiculos }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if licao.conteudo_completo.proverbio_chave %}
+                    <div class="bg-gradient-to-r from-indigo-900 to-indigo-950 text-white p-4 rounded-2xl border border-indigo-800 text-xs text-center font-bold">
+                        📖 {{ licao.conteudo_completo.proverbio_chave }}
+                    </div>
+                    {% endif %}
+
+                    <!-- ETAPA 2: RESUMO REFLEXIVO DO ALUNO -->
+                    <div class="pt-6 border-t-2 border-slate-100 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-black uppercase text-amber-600 tracking-wider">
+                                    ETAPA 2: RESUMO REFLEXIVO DO ALUNO
+                                </span>
+                                <h3 class="text-base font-extrabold text-slate-900 mt-0.5">
+                                    O Que Você Compreendeu Nesta Lição?
+                                </h3>
+                                <p class="text-xs text-slate-500">Escreva com as suas palavras. O teste é destrancado após submeter o resumo.</p>
+                            </div>
+                            {% if progresso_atual.resumo %}
+                            <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-black">
+                                ✅ Resumo Entregue
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        {% if progresso_atual.resumo %}
+                        <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-2xl text-xs text-emerald-950 space-y-1">
+                            <span class="font-extrabold block text-emerald-800">Seu Resumo Gravado:</span>
+                            <p class="italic">"{{ progresso_atual.resumo }}"</p>
+                        </div>
+                        {% else %}
+                        <form action="/ensino/submeter_resumo" method="POST" class="space-y-3 text-xs">
+                            <input type="hidden" name="licao_id" value="{{ licao.id }}">
+                            <textarea name="resumo" required rows="4" placeholder="Escreva aqui detalhadamente o que compreendeu dos pontos doutrinários acima..." class="w-full p-4 border-2 border-slate-200 rounded-2xl bg-slate-50 focus:bg-white focus:border-indigo-600 focus:outline-none font-medium leading-relaxed"></textarea>
+                            <button type="submit" class="w-full py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-xl shadow cursor-pointer text-xs transition">
+                                ✍️ Submeter Resumo & Desbloquear o Teste de Fixação
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- ETAPA 3: TESTE DE FIXAÇÃO TEOLÓGICA -->
+                    <div id="teste" class="pt-6 border-t-2 border-slate-100 space-y-4">
+                        <span class="text-xs font-black uppercase text-indigo-600 tracking-wider block">
+                            ETAPA 3: TESTE DE FIXAÇÃO TEOLÓGICA (MÍNIMO 70%)
+                        </span>
+
+                        {% if not progresso_atual.resumo %}
+                        <div class="bg-slate-100 border-2 border-dashed border-slate-300 p-8 rounded-2xl text-center space-y-2">
+                            <span class="text-3xl">🔒</span>
+                            <h4 class="font-bold text-sm text-slate-700">Teste Bloqueado</h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto">
+                                Para ter acesso a este teste, complete a leitura da lição e <b>submeta o seu resumo na Etapa 2</b>.
+                            </p>
+                        </div>
+                        {% else %}
+                        <form action="/ensino/submeter_teste" method="POST" class="space-y-4 text-xs">
+                            <input type="hidden" name="licao_id" value="{{ licao.id }}">
+
+                            {% for q in licao.questoes %}
+                            {% set q_idx = loop.index0 %}
+                            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                                <p class="font-extrabold text-sm text-slate-800">
+                                    {{ loop.index }}. {{ q.p }}
+                                </p>
+                                <div class="space-y-2">
+                                    {% for op in q.ops %}
+                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                        <input type="radio" name="q_{{ q_idx }}" value="{{ loop.index0 }}" required class="w-4 h-4 text-indigo-600">
+                                        <span class="text-slate-700 font-medium">{{ op }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                            <button type="submit" class="w-full py-4 bg-indigo-900 hover:bg-indigo-950 text-white font-black rounded-2xl shadow-lg cursor-pointer text-sm transition">
+                                🎯 Submeter Teste de Fixação
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- ETAPA 4: ESPAÇO TIRA-DÚVIDAS -->
+                    <div id="duvidas" class="pt-6 border-t-2 border-slate-100 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                                <span>💬</span> Espaço Tira-Dúvidas com o Professor ({{ aluno.professor or "Pastor" }})
+                            </h4>
+                            <span class="text-[10px] text-slate-400">Resposta bíblica e acompanhamento pastoral</span>
+                        </div>
+
+                        <form action="/ensino/duvida" method="POST" class="space-y-2 text-xs">
+                            <input type="hidden" name="licao_id" value="{{ licao.id }}">
+                            <div class="flex gap-2">
+                                <input type="text" name="pergunta" required placeholder="Tem alguma dúvida bíblica sobre esta lição? Pergunte aqui..." class="flex-1 h-11 px-3 border-2 border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-indigo-600 focus:outline-none">
+                                <button type="submit" class="px-5 h-11 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow cursor-pointer">
+                                    Perguntar
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="space-y-2.5">
+                            {% for d in duvidas %}
+                            <div class="p-3.5 bg-slate-50 rounded-xl text-xs space-y-1.5 border border-slate-200">
+                                <div class="font-bold text-slate-800 flex justify-between">
+                                    <span>❓ Sua Pergunta: "{{ d.pergunta }}"</span>
+                                    <span class="text-[10px] text-slate-400">{{ d.criado_em }}</span>
+                                </div>
+                                {% if d.resposta_professor %}
+                                <div class="p-2.5 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-950 text-[11px] leading-relaxed">
+                                    <b class="text-emerald-800 block">👨‍🏫 Resposta do seu Professor ({{ d.professor_nome or aluno.professor or 'Pastor' }}):</b>
+                                    {{ d.resposta_professor }}
+                                </div>
+                                {% else %}
+                                <div class="p-2.5 bg-white border border-indigo-100 rounded-lg text-indigo-950 text-[11px] leading-relaxed">
+                                    <b class="text-indigo-800 block">📖 Orientação do Manual:</b>
+                                    {{ d.resposta_sistema }}
+                                    <span class="text-[10px] text-slate-400 block mt-1 italic">⏳ Aguardando comentário adicional do seu professor...</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <p class="text-[11px] text-slate-400 italic text-center py-2">Nenhuma dúvida enviada sobre esta lição ainda.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Livro Geral de Membresia - {{ congregacao.nome }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+        }
+        table, th, td { border: 1px solid #cbd5e1 !important; }
+    </style>
+</head>
+<body class="bg-slate-100 p-6 font-sans text-slate-900 text-xs leading-normal">
+
+    <div class="no-print max-w-6xl mx-auto mb-6 flex justify-between items-center bg-white p-4 rounded-2xl shadow border">
+        <a href="/?aba=membros" class="px-4 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs shadow hover:bg-slate-900">
+            ← Voltar à Membresia
+        </a>
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 font-semibold">Total de {{ membros|length }} membros registados</span>
+            <button onclick="window.print()" class="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-xl shadow cursor-pointer text-xs">
+                🖨️ Imprimir Livro Geral (A4 Paisagem)
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto bg-white p-8 rounded-2xl shadow-xl print:shadow-none print:p-0 border border-slate-300 space-y-4">
+
+        <div class="flex items-center justify-between border-b-2 border-slate-900 pb-3">
+            <div class="w-16 h-16 flex items-center justify-center shrink-0">
+                {% include 'logo_ad.html' %}
+            </div>
+            <div class="text-center flex-1 px-4 space-y-0.5">
+                <h1 class="text-sm font-black uppercase tracking-wider text-slate-950">
+                    IGREJA EVANGÉLICA ASSEMBLEIA DE DEUS EM MOÇAMBIQUE
+                </h1>
+                <p class="text-[10px] font-serif italic text-slate-600">
+                    "Quando orardes, lembrai-vos de Moçambique! Remember Mozambique when you pray"
+                </p>
+                <p class="text-xs font-bold uppercase text-amber-800">
+                    LIVRO OFICIAL DE REGISTO DE MEMBRESIA • {{ congregacao.nome|upper }}
+                </p>
+                <p class="text-[10px] text-slate-500 font-semibold">{{ congregacao.distrito }} • {{ congregacao.provincia }} • Gerado em {{ agora }}</p>
+            </div>
+            <div class="w-16 h-16 flex items-center justify-center shrink-0">
+                {% include 'logo_ad.html' %}
+            </div>
+        </div>
+
+        <table class="w-full text-left border-collapse text-[10px]">
+            <thead>
+                <tr class="bg-slate-200 text-slate-800 font-black uppercase">
+                    <th class="p-1.5 w-10 text-center">Nº</th>
+                    <th class="p-1.5">Nome do Membro</th>
+                    <th class="p-1.5 w-20">Documento BI</th>
+                    <th class="p-1.5 w-16">Sexo</th>
+                    <th class="p-1.5 w-24">Estado Civil</th>
+                    <th class="p-1.5 w-32">Cargo Ministerial</th>
+                    <th class="p-1.5 w-28">Departamento</th>
+                    <th class="p-1.5 w-24">Zona / Célula</th>
+                    <th class="p-1.5 w-20 text-center">Batismo</th>
+                    <th class="p-1.5">Contacto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in membros %}
+                <tr class="hover:bg-slate-50 border-b border-slate-200">
+                    <td class="p-1.5 text-center font-bold text-slate-500">{{ loop.index }}</td>
+                    <td class="p-1.5 font-bold text-slate-900">{{ m.nome }}</td>
+                    <td class="p-1.5">{{ m.bi or '---' }}</td>
+                    <td class="p-1.5">{{ m.genero or 'Homem' }}</td>
+                    <td class="p-1.5">{{ m.estado_civil or '---' }}</td>
+                    <td class="p-1.5 font-semibold text-blue-900">{{ m.cargo or 'Membro' }}</td>
+                    <td class="p-1.5">{{ m.departamento or 'Geral' }}</td>
+                    <td class="p-1.5">{{ m.zona or '---' }}</td>
+                    <td class="p-1.5 text-center font-bold {% if m.data_batismo %}text-emerald-800{% else %}text-slate-400{% endif %}">
+                        {{ m.data_batismo or 'Não Batizado' }}
+                    </td>
+                    <td class="p-1.5">{{ m.contacto or '---' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="10" class="p-6 text-center text-slate-400 italic">Nenhum membro cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="pt-6 flex justify-between items-end text-[10px] text-slate-500 border-t border-slate-200">
+            <span>Assembleia de Deus em Moçambique • Sistema Oficial de Registo</span>
+            <div class="text-center w-64">
+                <div class="border-b border-slate-400 mb-1"></div>
+                <span class="font-bold text-slate-800 uppercase block">O Secretário da Igreja</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

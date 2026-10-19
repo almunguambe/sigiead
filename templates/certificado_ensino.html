@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificado de Conclusão - {{ aluno.nome_aluno }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+        }
+    </style>
+</head>
+<body class="bg-slate-200 min-h-screen p-8 font-serif flex flex-col items-center justify-center">
+
+    <div class="no-print mb-6 flex gap-4 font-sans text-xs">
+        <a href="/ensino/aulas" class="px-4 py-2 bg-slate-800 text-white rounded-xl font-bold shadow">← Voltar às Aulas</a>
+        <button onclick="window.print()" class="px-6 py-2 bg-indigo-700 hover:bg-indigo-800 text-white font-extrabold rounded-xl shadow cursor-pointer">
+            🖨️ Imprimir Certificado Oficial / Guardar PDF
+        </button>
+    </div>
+
+    <div class="w-full max-w-4xl bg-white p-12 rounded-3xl shadow-2xl border-8 border-double border-amber-600/70 relative print:shadow-none print:border-amber-700">
+        
+        <div class="text-center border-b-2 border-amber-600/40 pb-6 mb-8 font-sans">
+            <div class="w-16 h-16 mx-auto rounded-full bg-indigo-950 text-white flex items-center justify-center font-black text-2xl shadow mb-2 border-2 border-amber-400">
+                AD
+            </div>
+            <h1 class="text-2xl font-black uppercase tracking-widest text-slate-950">ASSEMBLEIA DE DEUS EM MOÇAMBIQUE</h1>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-amber-800 mt-0.5">MINISTÉRIO THAVANE • SEDE REGIONAL DE CHICUQUE - MAXIXE</h2>
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Departamento de Educação Cristã & Escola de Integração Bíblica</p>
+        </div>
+
+        <div class="text-center my-6 font-sans">
+            <h3 class="text-3xl font-black uppercase tracking-widest text-indigo-950 underline decoration-amber-500 underline-offset-8">
+                CERTIFICADO DE FORMAÇÃO DOUTRINÁRIA
+            </h3>
+        </div>
+
+        <div class="text-center max-w-2xl mx-auto space-y-4 my-8 text-base leading-relaxed text-slate-800">
+            <p>
+                Certificamos solenemente que o(a) irmão(ã)
+            </p>
+            <p class="text-3xl font-extrabold text-indigo-950 uppercase border-b-2 border-slate-300 pb-1 mx-8 font-sans">
+                {{ aluno.nome_aluno }}
+            </p>
+            <p class="text-sm">
+                Concluiu com êxito todas as lições curriculares, resumos e testes teológicos do Manual Oficial da Igreja, obtendo o aproveitamento de <b class="text-indigo-950 font-sans text-lg">{{ "%.1f"|format(aluno.aproveitamento or 0) }}%</b>, sendo declarado(a) apto(a) e promovido(a) na fé cristã.
+            </p>
+            <p class="text-xs italic text-slate-600 pt-2 font-sans">
+                "Procura apresentar-te a Deus aprovado, como obreiro que não tem de que se envergonhar, que maneja bem a palavra da verdade." — <b>2 Timóteo 2:15</b>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-12 mt-12 pt-8 border-t border-slate-200 text-center font-sans text-xs">
+            <div>
+                <div class="w-56 mx-auto border-b border-slate-600 mb-1.5"></div>
+                <p class="font-extrabold text-slate-900">Pastor Presidente Regional</p>
+                <p class="text-[10px] text-slate-500">IEAD Sede Chicuque</p>
+            </div>
+            <div>
+                <div class="w-56 mx-auto border-b border-slate-600 mb-1.5"></div>
+                <p class="font-extrabold text-slate-900">Diretor de Educação Cristã</p>
+                <p class="text-[10px] text-slate-500">Ministério Thavane</p>
+            </div>
+        </div>
+
+        <div class="text-center font-sans text-[10px] text-slate-400 mt-6">
+            Emitido e homologado pela Secretaria-Geral em Chicuque, aos {{ data_extenso }}.
+        </div>
+    </div>
+</body>
+</html>

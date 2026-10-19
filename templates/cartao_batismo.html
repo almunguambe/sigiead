@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificado de Baptismo - {{ m.nome }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 p-6 font-sans text-slate-900 flex flex-col items-center justify-center min-h-screen">
+
+    <div class="no-print mb-6 flex gap-4">
+        <button onclick="window.print()" class="px-6 py-2.5 bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-xl shadow cursor-pointer text-xs">
+            🖨️ Imprimir Certificado de Baptismo (A4 Paisagem)
+        </button>
+        <button onclick="window.close()" class="px-4 py-2.5 bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold rounded-xl text-xs">
+            Fechar
+        </button>
+    </div>
+
+    <!-- MOLDURA SAGRADA DO CERTIFICADO -->
+    <div class="w-[960px] h-[640px] bg-white rounded-3xl shadow-2xl border-8 border-amber-600/60 p-10 flex flex-col justify-between relative overflow-hidden">
+        <!-- Moldura Interior Dupla -->
+        <div class="absolute inset-3 border-2 border-amber-500/40 pointer-events-none rounded-2xl"></div>
+
+        <!-- CABEÇALHO COM LOGO OFICIAL -->
+        <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4">
+            <div class="w-24 h-24 flex items-center justify-center">
+                {% include 'logo_ad.html' %}
+            </div>
+            <div class="text-center flex-1 px-4 space-y-1">
+                <h1 class="text-xl font-black uppercase tracking-wider text-slate-950">
+                    IGREJA EVANGÉLICA ASSEMBLEIA DE DEUS EM MOÇAMBIQUE
+                </h1>
+                <p class="text-xs font-serif italic text-slate-600">
+                    "Quando orardes, lembrai-vos de Moçambique! Remember Mozambique when you pray"
+                </p>
+                <p class="text-xs font-bold uppercase text-amber-800 tracking-widest">
+                    PROVÍNCIA DE {{ congregacao.provincia|upper }} • DISTRITO DE {{ congregacao.distrito|upper }}
+                </p>
+                <p class="text-[11px] font-bold uppercase text-slate-700">{{ congregacao.nome }}</p>
+            </div>
+            <div class="w-24 h-24 flex items-center justify-center">
+                {% include 'logo_ad.html' %}
+            </div>
+        </div>
+
+        <!-- TÍTULO CENTRAL -->
+        <div class="text-center my-3">
+            <span class="inline-block px-8 py-1.5 bg-blue-900 text-white font-black text-sm uppercase tracking-[0.3em] rounded-full shadow">
+                CERTIFICADO DE BAPTISMO NAS ÁGUAS
+            </span>
+        </div>
+
+        <!-- TEXTO LITÚRGICO OFICIAL -->
+        <div class="text-center space-y-4 px-12 leading-relaxed text-sm">
+            <p class="text-slate-700">
+                Certificamos para os devidos efeitos eclesiásticos e espirituais que o irmão(ã)
+            </p>
+            <p class="text-2xl font-black text-slate-950 uppercase tracking-wide border-b-2 border-slate-800 pb-1 max-w-2xl mx-auto font-serif">
+                {{ m.nome }}
+            </p>
+            <p class="text-slate-700">
+                tendo feito pública profissão de fé no Senhor e Salvador Jesus Cristo, desceu às águas baptismais em nome do Pai, do Filho e do Espírito Santo no dia <b>{{ m.data_batismo }}</b>, tornando-se membro em plena comunhão desta congregação.
+            </p>
+            <p class="text-xs italic text-amber-900 font-serif max-w-xl mx-auto bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                "De sorte que fomos sepultados com ele pelo baptismo na morte; para que, como Cristo ressuscitou dos mortos pela glória do Pai, assim andemos nós também em novidade de vida." (Romanos 6:4)
+            </p>
+        </div>
+
+        <!-- ASSINATURAS E CHANCELA -->
+        <div class="pt-6 flex justify-around items-end border-t border-slate-300 text-xs">
+            <div class="text-center w-64 space-y-1">
+                <div class="border-b border-slate-800 w-full mb-1"></div>
+                <p class="font-extrabold text-slate-900">O Ministro Oficiante</p>
+                <p class="text-[10px] text-slate-500 uppercase">Pastor / Evangelista</p>
+            </div>
+            <div class="text-center text-[11px] space-y-1 text-slate-600">
+                <p>Emitido aos {{ data_extenso }}</p>
+                <div class="w-16 h-16 rounded-full border border-dashed border-slate-400 mx-auto flex items-center justify-center text-[8px] uppercase text-slate-400">
+                    Selo / Carimbo
+                </div>
+            </div>
+            <div class="text-center w-64 space-y-1">
+                <div class="border-b border-slate-800 w-full mb-1"></div>
+                <p class="font-extrabold text-slate-900">O Pastor Presidente</p>
+                <p class="text-[10px] text-slate-500 uppercase">Direcção da Congregação</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,27 +1,21 @@
 {
-  "name": "IEAD Chicuque - Gestão & Ensino",
-  "short_name": "IEAD Chicuque",
-  "description": "Sistema Eclesiástico e Escola Bíblica da IEAD Chicuque",
-  "start_url": "/",
-  "scope": "/",
-  "id": "/",
+  "name": "SIGIEAD - Assembleia de Deus",
+  "short_name": "SIGIEAD",
+  "description": "Sistema Integrado de Gestão da Igreja Evangélica Assembleia de Deus em Moçambique",
+  "start_url": "/login",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "window-controls-overlay"
-  ],
-  "background_color": "#0d3b66",
-  "theme_color": "#0d3b66",
+  "background_color": "#090d16",
+  "theme_color": "#1e1b4b",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/static/logo.png",
+      "src": "/static/img/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/static/logo.png",
+      "src": "/static/img/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
