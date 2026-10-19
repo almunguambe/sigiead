@@ -5,6 +5,58 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 app = Flask(__name__)
+
+# =============================================================================
+# DIVISÃO TERRITORIAL OFICIAL DE MOÇAMBIQUE (PROVÍNCIAS E DISTRITOS)
+# =============================================================================
+DIVISAO_TERRITORIAL = {
+    "Inhambane": [
+        "Maxixe (Cidade/Distrito)", "Inhambane (Cidade)", "Homoíne", "Jangamo",
+        "Massinga", "Morrumbene", "Vilankulo", "Zavala", "Inharrime",
+        "Panda", "Funhalouro", "Mabote", "Govuro"
+    ],
+    "Gaza": [
+        "Xai-Xai (Cidade)", "Chókwè", "Bilene", "Chibuto", "Mandlakazi",
+        "Guijá", "Mabalane", "Chigubo", "Chicualacuala", "Massingir", "Massangena", "Limpopo"
+    ],
+    "Maputo Província": [
+        "Matola (Cidade)", "Boane", "Marracuene", "Manhiça", "Moamba", "Namaacha", "Matutuíne"
+    ],
+    "Maputo Cidade": [
+        "KaMpfumo", "Nlhamankulu", "KaMaxakeni", "KaMavota", "KaMubukwana", "KaTembe", "KaNyaka"
+    ],
+    "Sofala": [
+        "Beira (Cidade)", "Dondo", "Nhamatanda", "Búzi", "Gorongosa", "Cheringoma",
+        "Marromeu", "Caia", "Chemba", "Machanga", "Muanza", "Chibabava"
+    ],
+    "Manica": [
+        "Chimoio (Cidade)", "Gondola", "Manica", "Mossurize", "Sussundenga", "Báruè",
+        "Guro", "Macossa", "Tambara", "Vanduzi", "Macate"
+    ],
+    "Tete": [
+        "Tete (Cidade)", "Moatize", "Angónia", "Tsangano", "Mutarara", "Changara",
+        "Cahora Bassa", "Magoe", "Zumbo", "Marávia", "Chifunde", "Macanga", "Dôa", "Marara"
+    ],
+    "Zambézia": [
+        "Quelimane (Cidade)", "Mocuba", "Gurué", "Alto Molócue", "Milange", "Morrumbala",
+        "Maganja da Costa", "Namacurra", "Nicoadala", "Pebane", "Gilé", "Ile", "Inhassunge",
+        "Lugela", "Mopeia", "Chinde", "Derre", "Luabo", "Mulevala", "Molumbo"
+    ],
+    "Nampula": [
+        "Nampula (Cidade)", "Nacala-Porto", "Angoche", "Ilha de Moçambique", "Monapo",
+        "Meconta", "Mogovolas", "Murrupula", "Ribaue", "Malema", "Moma", "Mossuril",
+        "Muecate", "Nacala-a-Velha", "Eráti", "Memba", "Lalaua", "Larde", "Liúpo"
+    ],
+    "Niassa": [
+        "Lichinga (Cidade)", "Cuamba", "Mandimba", "Lago (Metangula)", "Sanga", "Mavago",
+        "Marrupa", "Majune", "Mecanhelas", "Muembe", "Ngauma", "Nipepe", "Chimbonila"
+    ],
+    "Cabo Delgado": [
+        "Pemba (Cidade)", "Montepuez", "Mocímboa da Praia", "Palma", "Mueda", "Chiúre",
+        "Ancuabe", "Balama", "Namuno", "Meluco", "Macomia", "Quissanga", "Ibo", "Muidumbe"
+    ]
+}
+
 from ensino_dados import CURRICULO_CLASSES, TODAS_LICOES, MAPA_LICOES
 app.secret_key = os.environ.get('SECRET_KEY', 'iead_mz_multitenant_2026')
 
