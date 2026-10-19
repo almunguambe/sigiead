@@ -193,9 +193,9 @@ def inicializar_banco():
 
 inicializar_banco()
 
-    # Garantir conta de professor ativa
-    if not consultar_um("SELECT id FROM usuarios_sistema WHERE usuario = 'professor'"):
-        executar_comando("INSERT INTO usuarios_sistema (nome, usuario, senha, nivel, perfil, congregacao_id, criado_em) VALUES ('Professor de Doutrina', 'professor', 'prof123', 'local', 'professor', 1, '2026-10-19 23:00')")
+# Garantir conta de professor ativa
+if not consultar_um("SELECT id FROM usuarios_sistema WHERE usuario = 'professor'"):
+    executar_comando("INSERT INTO usuarios_sistema (nome, usuario, senha, nivel, perfil, congregacao_id, criado_em) VALUES ('Professor de Doutrina', 'professor', 'prof123', 'local', 'professor', 1, '2026-10-19 23:00')")
 
 
 # Garantir nome correto de Chicuque como congregação com suas zonas
