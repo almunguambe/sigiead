@@ -10,14 +10,24 @@ app.secret_key = os.environ.get('SECRET_KEY', 'iead_mz_multitenant_2026')
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
+# =============================================================================
+# MOTOR DE BASE DE DADOS HÍBRIDO (SUPABASE / POSTGRESQL & SQLITE)
+# =============================================================================
+import os
+import sqlite3
+
+DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+USAR_POSTGRES = bool(DATABASE_URL and 'postgres' in DATABASE_URL.lower())
+
+if USAR_POSTGRES:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+
 def get_db():
-    if DATABASE_URL:
-        import psycopg2
-        import psycopg2.extras
-        url = DATABASE_URL
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql://", 1)
-        return psycopg2.connect(url, sslmode='require')
+    if USAR_POSTGRES:
+        conn = psycopg2.connect(DATABASE_URL)
+        conn.autocommit = True  # Garante gravação imediata no Supabase
+        return conn
     else:
         conn = sqlite3.connect('igreja.db')
         conn.row_factory = sqlite3.Row
@@ -25,59 +35,62 @@ def get_db():
 
 def executar_comando(sql, params=()):
     conn = get_db()
-    cur = conn.cursor()
     try:
-        if DATABASE_URL:
-            sql = sql.replace('?', '%s')
-        cur.execute(sql, params)
-        if hasattr(conn, 'commit'): conn.commit()
+        if USAR_POSTGRES:
+            # Converte marcadores SQLite (?) para marcadores PostgreSQL (%s)
+            sql_pg = sql.replace('?', '%s')
+            with conn.cursor() as cur:
+                cur.execute(sql_pg, params)
+            conn.commit()
+        else:
+            with conn:
+                conn.execute(sql, params)
     except Exception as e:
-        if hasattr(conn, 'rollback'): conn.rollback()
-        print(f"[ERRO SQL]: {e}")
+        print(f"[ERRO DB EXECUTAR]: {e} | SQL: {sql}")
+        raise e
     finally:
-        cur.close()
         conn.close()
 
 def consultar_todos(sql, params=()):
     conn = get_db()
-    cur = conn.cursor()
-    dados = []
     try:
-        if DATABASE_URL:
-            sql = sql.replace('?', '%s')
-        cur.execute(sql, params)
-        if cur.description:
-            cols = [c[0].lower() for c in cur.description]
-            for r in cur.fetchall():
-                dados.append(dict(zip(cols, r)))
+        if USAR_POSTGRES:
+            sql_pg = sql.replace('?', '%s')
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(sql_pg, params)
+                res = cur.fetchall()
+                return [dict(r) for r in res]
+        else:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            res = cur.fetchall()
+            return [dict(r) for r in res]
     except Exception as e:
-        print(f"[ERRO CONSULTA]: {e}")
+        print(f"[ERRO DB CONSULTAR TODOS]: {e} | SQL: {sql}")
+        return []
     finally:
-        cur.close()
         conn.close()
-    return dados
 
 def consultar_um(sql, params=()):
-    res = consultar_todos(sql, params)
-    return res[0] if res else None
+    conn = get_db()
+    try:
+        if USAR_POSTGRES:
+            sql_pg = sql.replace('?', '%s')
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(sql_pg, params)
+                res = cur.fetchone()
+                return dict(res) if res else None
+        else:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            res = cur.fetchone()
+            return dict(res) if res else None
+    except Exception as e:
+        print(f"[ERRO DB CONSULTAR UM]: {e} | SQL: {sql}")
+        return None
+    finally:
+        conn.close()
 
-# ESTRUTURA TERRITORIAL OFICIAL: 36 DISTRITOS DE MOÇAMBIQUE
-DIVISAO_TERRITORIAL = {
-    'Inhambane': [
-        'Funhalouro', 'Govuro', 'Homoíne', 'Inhambane (Cidade/Distrito)',
-        'Inharrime', 'Inhassoro', 'Jangamo', 'Mabote', 'Massinga',
-        'Maxixe (Cidade/Distrito)', 'Morrumbene', 'Panda', 'Vilanculos', 'Zavala'
-    ],
-    'Gaza': [
-        'Bilene', 'Chibuto', 'Chicualacuala', 'Chigubo', 'Chókwè',
-        'Chongoene', 'Guijá', 'Limpopo', 'Mabalane', 'Manjacaze',
-        'Mapai', 'Massangena', 'Massingir', 'Xai-Xai'
-    ],
-    'Maputo': [
-        'Boane', 'Magude', 'Manhiça', 'Marracuene',
-        'Matola (Capital Provincial)', 'Matutuíne', 'Moamba', 'Namaacha'
-    ]
-}
 
 def inicializar_banco():
     is_pg = bool(DATABASE_URL)
