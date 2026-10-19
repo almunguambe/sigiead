@@ -344,8 +344,8 @@
                                     <span class="text-[10px] text-slate-500">Mentor: {{ a.professor or 'Pastor' }}</span>
                                 </td>
                                 <td class="p-2.5 text-center">
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black {% if (a.aproveitamento or 0) >= 70 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
-                                        {{ "%.0f"|format(a.aproveitamento or 0) }}%
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-black {% if (a.aproveitamento|float if a.aproveitamento else 0) >= 70 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                        {{ "%.0f"|format(a.aproveitamento|float if a.aproveitamento else 0) }}%
                                     </span>
                                 </td>
                                 <td class="p-2.5 text-center">
@@ -361,7 +361,7 @@
                                 </td>
                                 <td class="p-2.5 text-center">
                                     <div class="flex items-center justify-center gap-1.5">
-                                        {% if a.situacao != 'Apto / Aprovado' and (a.aproveitamento or 0) >= 70 %}
+                                        {% if a.situacao != 'Apto / Aprovado' and (a.aproveitamento|float if a.aproveitamento else 0) >= 70 %}
                                         <a href="/doutrina/aprovar/{{ a.id }}" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black shadow" title="Aprovar para Batismo">
                                             Aprovar
                                         </a>
