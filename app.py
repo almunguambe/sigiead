@@ -424,6 +424,42 @@ def login():
         else:
             erro = "Credenciais inválidas! Verifique o utilizador e a palavra-passe."
 
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('login.html', erro=erro)
 
 @app.route('/')
@@ -457,6 +493,42 @@ def index():
     plano_para_relatar = None
     if id_relatar:
         plano_para_relatar = consultar_um("SELECT * FROM planificacao WHERE id = ?", (id_relatar,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('dashboard.html', aba_ativa=aba, plano_relatar=plano_para_relatar)
 
 # =============================================================================
@@ -571,6 +643,42 @@ def membros_relatorio_geral():
     cid = session.get('congregacao_id', 1)
     membros = consultar_todos("SELECT * FROM membros WHERE congregacao_id = ? ORDER BY nome ASC", (cid,))
     cong = consultar_um("SELECT * FROM congregacoes WHERE id = ?", (cid,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('relatorio_membros.html', membros=membros, congregacao=cong, agora=datetime.now().strftime('%d/%m/%Y às %H:%M'))
 
 @app.route('/membros/<int:id>/cartao')
@@ -579,6 +687,42 @@ def membros_cartao(id):
     membro = consultar_um("SELECT * FROM membros WHERE id = ? AND congregacao_id = ?", (id, cid))
     if not membro: return redirect('/?aba=membros')
     cong = consultar_um("SELECT * FROM congregacoes WHERE id = ?", (cid,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('cartao_membro.html', m=membro, congregacao=cong, agora_ano=datetime.now().year)
 
 @app.route('/membros/<int:id>/batismo')
@@ -588,6 +732,42 @@ def membros_batismo(id):
     if not membro or not membro.get('data_batismo'):
         return "<script>alert('Membro sem data de baptismo registada!'); window.location.href='/?aba=membros';</script>"
     cong = consultar_um("SELECT * FROM congregacoes WHERE id = ?", (cid,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('cartao_batismo.html', m=membro, congregacao=cong, data_extenso=datetime.now().strftime('%d de %B de %Y'))
 
 @app.route('/membros/<int:id>/recomendacao')
@@ -596,6 +776,42 @@ def membros_recomendacao(id):
     membro = consultar_um("SELECT * FROM membros WHERE id = ? AND congregacao_id = ?", (id, cid))
     if not membro: return redirect('/?aba=membros')
     cong = consultar_um("SELECT * FROM congregacoes WHERE id = ?", (cid,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('carta_recomendacao.html', m=membro, congregacao=cong, data_extenso=datetime.now().strftime('%d de %B de %Y'), agora_ano=datetime.now().year)
 
 @app.route('/cultos/novo', methods=['POST'])
@@ -785,6 +1001,42 @@ def secretaria_balanco():
 
     planos = consultar_todos("SELECT * FROM planificacao WHERE congregacao_id = ? ORDER BY id ASC", (cid,))
     balanco = consultar_um("SELECT * FROM balanco_anual WHERE ano = ? AND congregacao_id = ?", (ano_sel, cid))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('balanco_anual.html', ano_sel=ano_sel, planos=planos, balanco=balanco)
 
 @app.route('/secretaria/relatorio-anual')
@@ -816,6 +1068,42 @@ def secretaria_relatorio_anual():
         'constrangimentos': constrangimentos_lista,
         'perspectivas': perspectivas_lista
     }
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('relatorio_anual_modelo.html', rel=rel, congregacao=cong)
 
 # DOUTRINA E ENSINO
@@ -904,6 +1192,42 @@ def aluno_aulas():
 
     duvidas = consultar_todos("SELECT * FROM duvidas_alunos WHERE aluno_id = ? AND licao_id = ? ORDER BY id DESC", (aluno_id, licao_atual_id))
 
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template(
         'portal_aluno.html',
         aluno=aluno,
@@ -981,12 +1305,84 @@ def aluno_exame_final():
     aluno_id = session.get('aluno_id')
     if not aluno_id: return redirect('/login')
     aluno = consultar_um("SELECT * FROM doutrina WHERE id = ?", (aluno_id,))
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('aluno_exame_final.html', aluno=aluno)
 
 @app.route('/ensino/certificado/<int:aluno_id>')
 def aluno_certificado(aluno_id):
     aluno = consultar_um("SELECT * FROM doutrina WHERE id = ?", (aluno_id,))
     if not aluno: return redirect('/login')
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template('certificado_ensino.html', aluno=aluno, data_extenso=datetime.now().strftime('%d de %B de %Y'))
 
 @app.route('/config/opcoes/adicionar', methods=['POST'])
@@ -1095,6 +1491,42 @@ def financas_relatorio_geral():
             cat_in[cat] = cat_in.get(cat, 0.0) + v
         else:
             cat_out[cat] = cat_out.get(cat, 0.0) + v
+
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
 
     return render_template(
         'relatorio_financeiro.html',
@@ -1244,6 +1676,42 @@ def secretaria_estatistica_agregada():
         'media_culto_geral': media_culto_geral
     }
 
+    
+    # Carregar dados completos de Ensino & Doutrina
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    duvidas_pendentes = consultar_todos("""
+        SELECT d.*, a.nome_aluno as aluno_nome 
+        FROM duvidas_alunos d 
+        LEFT JOIN doutrina a ON d.aluno_id = a.id 
+        WHERE d.resposta_professor IS NULL OR d.resposta_professor = '' 
+        ORDER BY d.id DESC
+    """)
+    
+    classes_padrao = [
+        'Preparação para Batismo nas Águas',
+        'Discipulado de Novos Convertidos',
+        'Classe I - Primeiros Passos',
+        'Classe II - Vida Cristã',
+        'Classe III - Maturidade Cristã',
+        'Classe IV - Candidatos ao Batismo'
+    ]
+    classes_db = [op['valor'] for op in opcoes if op.get('categoria') == 'classe_doutrina']
+    lista_classes = list(dict.fromkeys(classes_padrao + classes_db))
+
+    professores_padrao = ['Anselmo Leonardo Munguambe', 'Pastor Dirigente']
+    nomes_prof_sistema = [p['nome'] for p in professores_cadastrados]
+    lista_professores = list(dict.fromkeys(professores_padrao + nomes_prof_sistema))
+
+    # Estatísticas de Ensino
+    aptos_count = len([a for a in doutrina if a.get('situacao') == 'Apto / Aprovado'])
+    stats_ensino = {
+        'total_alunos': len(doutrina),
+        'aptos': aptos_count,
+        'em_formacao': len(doutrina) - aptos_count,
+        'total_professores': len(professores_cadastrados),
+        'total_duvidas': len(duvidas_pendentes)
+    }
+
     return render_template(
         'relatorio_estatistico_agregado.html',
         jurisdicao_titulo=jurisdicao_titulo,
@@ -1285,6 +1753,40 @@ def ensino_responder_duvida():
             "UPDATE duvidas_alunos SET resposta_professor = ?, professor_nome = ? WHERE id = ?",
             (resposta, u_nome, duvida_id)
         )
+    return redirect('/?aba=doutrina')
+
+
+# =============================================================================
+# GESTÃO DE PROFESSORES E GABINETE PEDAGÓGICO
+# =============================================================================
+@app.route('/doutrina/gravar_professor', methods=['POST'])
+def doutrina_gravar_professor():
+    if not session.get('usuario_id'):
+        return redirect('/login')
+    if session.get('usuario_perfil') not in ['admin', 'pastor']:
+        return "<script>alert('Apenas o Administrador ou Pastor pode cadastrar novos professores.'); window.location.href='/?aba=doutrina';</script>"
+
+    cid = session.get('congregacao_id', 1)
+    nome = request.form.get('nome_professor', '').strip()
+    usuario = request.form.get('usuario_professor', '').strip().lower()
+    senha = request.form.get('senha_professor', '').strip()
+
+    if nome and usuario and senha:
+        existe = consultar_um("SELECT id FROM usuarios_sistema WHERE usuario = ?", (usuario,))
+        if existe:
+            return "<script>alert('Este nome de usuário já existe! Por favor, escolha outro.'); window.location.href='/?aba=doutrina';</script>"
+        
+        executar_comando(
+            "INSERT INTO usuarios_sistema (nome, usuario, senha, nivel, perfil, congregacao_id, criado_em) VALUES (?, ?, ?, 'local', 'professor', ?, ?)",
+            (nome, usuario, senha, cid, datetime.now().strftime('%Y-%m-%d %H:%M'))
+        )
+    return redirect('/?aba=doutrina')
+
+@app.route('/doutrina/professor/eliminar/<int:prof_id>')
+def doutrina_eliminar_professor(prof_id):
+    if not session.get('usuario_id') or session.get('usuario_perfil') not in ['admin', 'pastor']:
+        return redirect('/?aba=doutrina')
+    executar_comando("DELETE FROM usuarios_sistema WHERE id = ? AND perfil = 'professor'", (prof_id,))
     return redirect('/?aba=doutrina')
 
 if __name__ == '__main__':
