@@ -193,6 +193,11 @@ def inicializar_banco():
 
 inicializar_banco()
 
+    # Garantir conta de professor ativa
+    if not consultar_um("SELECT id FROM usuarios_sistema WHERE usuario = 'professor'"):
+        executar_comando("INSERT INTO usuarios_sistema (nome, usuario, senha, nivel, perfil, congregacao_id, criado_em) VALUES ('Professor de Doutrina', 'professor', 'prof123', 'local', 'professor', 1, '2026-10-19 23:00')")
+
+
 # Garantir nome correto de Chicuque como congregação com suas zonas
 executar_comando("UPDATE congregacoes SET nome = 'Igreja de Chicuque' WHERE id = 1 OR nome LIKE '%Sede Regional%'")
 
@@ -1248,6 +1253,26 @@ def pwa_manifest():
 @app.route('/sw.js')
 def pwa_sw():
     return app.send_static_file('sw.js')
+
+
+# =============================================================================
+# GABINETE DO PROFESSOR: RESPONDER DÚVIDAS DOS ALUNOS
+# =============================================================================
+@app.route('/ensino/responder_duvida', methods=['POST'])
+def ensino_responder_duvida():
+    if not session.get('usuario_id'):
+        return redirect('/login')
+
+    duvida_id = request.form.get('duvida_id')
+    resposta = request.form.get('resposta', '').strip()
+    u_nome = session.get('usuario_nome', 'Professor')
+
+    if duvida_id and resposta:
+        executar_comando(
+            "UPDATE duvidas_alunos SET resposta_professor = ?, professor_nome = ? WHERE id = ?",
+            (resposta, u_nome, duvida_id)
+        )
+    return redirect('/?aba=doutrina')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
