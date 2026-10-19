@@ -37,14 +37,19 @@ def executar_comando(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            # Converte marcadores SQLite (?) para marcadores PostgreSQL (%s)
-            sql_pg = sql.replace('?', '%s')
             with conn.cursor() as cur:
-                cur.execute(sql_pg, params)
+                if params:
+                    sql_pg = sql.replace('?', '%s')
+                    cur.execute(sql_pg, params)
+                else:
+                    cur.execute(sql)
             conn.commit()
         else:
             with conn:
-                conn.execute(sql, params)
+                if params:
+                    conn.execute(sql, params)
+                else:
+                    conn.execute(sql)
     except Exception as e:
         print(f"[ERRO DB EXECUTAR]: {e} | SQL: {sql}")
         raise e
@@ -55,14 +60,20 @@ def consultar_todos(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            sql_pg = sql.replace('?', '%s')
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(sql_pg, params)
+                if params:
+                    sql_pg = sql.replace('?', '%s')
+                    cur.execute(sql_pg, params)
+                else:
+                    cur.execute(sql)
                 res = cur.fetchall()
                 return [dict(r) for r in res]
         else:
             cur = conn.cursor()
-            cur.execute(sql, params)
+            if params:
+                cur.execute(sql, params)
+            else:
+                cur.execute(sql)
             res = cur.fetchall()
             return [dict(r) for r in res]
     except Exception as e:
@@ -75,14 +86,20 @@ def consultar_um(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            sql_pg = sql.replace('?', '%s')
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute(sql_pg, params)
+                if params:
+                    sql_pg = sql.replace('?', '%s')
+                    cur.execute(sql_pg, params)
+                else:
+                    cur.execute(sql)
                 res = cur.fetchone()
                 return dict(res) if res else None
         else:
             cur = conn.cursor()
-            cur.execute(sql, params)
+            if params:
+                cur.execute(sql, params)
+            else:
+                cur.execute(sql)
             res = cur.fetchone()
             return dict(res) if res else None
     except Exception as e:
@@ -212,7 +229,7 @@ if not consultar_um("SELECT id FROM usuarios_sistema WHERE usuario = 'professor'
 
 
 # Garantir nome correto de Chicuque como congregação com suas zonas
-executar_comando("UPDATE congregacoes SET nome = 'Igreja de Chicuque' WHERE id = 1 OR nome LIKE '%Sede Regional%'")
+executar_comando("UPDATE congregacoes SET nome = 'Igreja de Chicuque' WHERE id = 1 OR nome LIKE ?", ('%Sede Regional%',))
 
 
 # =============================================================================
