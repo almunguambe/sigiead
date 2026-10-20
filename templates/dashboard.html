@@ -1541,18 +1541,22 @@
                         <label class="block font-semibold mb-1">Nome Completo do Aluno *</label>
                         <input type="text" name="nome_aluno" required placeholder="Nome do formando" class="w-full h-10 px-3 border rounded-xl bg-slate-50 font-bold">
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                         <div>
-                            <label class="block font-semibold mb-1">Classe *</label>
-                            <select name="classe" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-bold">
-                                {% for op in opcoes.get('classe_doutrina', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
+                            <label class="block font-bold text-slate-700 mb-1 text-xs">Tipo de Aula / Formação *</label>
+                            <select name="classe" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-bold text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                <option value="Discipulado">📖 Discipulado (Novos Convertidos)</option>
+                                <option value="Batismo">🌊 Batismo (Preparação Batismal)</option>
+                                <option value="Ministerial">🎓 Ministerial (Escola Ministerial)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold mb-1">Instrutor / Mentor</label>
-                            <input type="text" name="professor" placeholder="Pr. / Diác." class="w-full h-10 px-3 border rounded-xl bg-slate-50">
+                            <label class="block font-bold text-slate-700 mb-1 text-xs">Instrutor / Mentor</label>
+                            <input type="text" name="professor" placeholder="Pr. / Diác. / Instrutor" class="w-full h-11 px-3 border border-slate-300 rounded-xl bg-white font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm">
                         </div>
                     </div>
+
                     
                     <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 space-y-2">
                         <div class="font-bold text-amber-900 text-[10px] uppercase">Acesso à Área de Ensino do Aluno</div>
