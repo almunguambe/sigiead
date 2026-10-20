@@ -184,6 +184,46 @@ def consultar_um(sql, params=()):
         conn.close()
 
 
+def migrar_colunas_doutrina():
+    conn = get_db()
+    colunas_necessarias = [
+        ('licao_atual', "TEXT DEFAULT 'Lição 1'"),
+        ('congregacao_id', "INTEGER DEFAULT 1"),
+        ('classe', "TEXT DEFAULT 'Discipulado'"),
+        ('professor', "TEXT DEFAULT 'Pastor Dirigente'"),
+        ('data_inicio', "TEXT"),
+        ('presencas', "INTEGER DEFAULT 0"),
+        ('situacao', "TEXT DEFAULT 'Em Formação'"),
+        ('usuario', "TEXT"),
+        ('senha', "TEXT"),
+        ('aproveitamento', "REAL DEFAULT 0.0"),
+        ('criado_em', "TEXT")
+    ]
+    try:
+        if USAR_POSTGRES:
+            with conn.cursor() as cur:
+                for col_name, col_def in colunas_necessarias:
+                    try:
+                        cur.execute(f"ALTER TABLE doutrina ADD COLUMN IF NOT EXISTS {col_name} {col_def};")
+                    except Exception:
+                        try:
+                            conn.rollback()
+                        except Exception:
+                            pass
+        else:
+            cur = conn.cursor()
+            cur.execute("PRAGMA table_info(doutrina)")
+            existentes = [r[1] for r in cur.fetchall()]
+            for col_name, col_def in colunas_necessarias:
+                if col_name not in existentes:
+                    try:
+                        cur.execute(f"ALTER TABLE doutrina ADD COLUMN {col_name} {col_def}")
+                    except Exception:
+                        pass
+            conn.commit()
+    except Exception as e:
+        print(f"[AVISO MIGRACAO DOUTRINA]: {e}")
+
 def inicializar_banco():
     is_pg = bool(DATABASE_URL)
     conn = get_db()
@@ -331,7 +371,7 @@ def injetar_dados():
     cultos = consultar_todos("SELECT * FROM cultos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     convertidos = consultar_todos("SELECT * FROM novos_convertidos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     caixa = consultar_todos("SELECT * FROM caixa WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
-    doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? OR congregacao_id IS NULL ORDER BY id DESC", (cid,))
+    doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
     casamentos = consultar_todos("SELECT * FROM casamentos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     obitos = consultar_todos("SELECT * FROM obitos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     
