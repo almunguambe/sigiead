@@ -76,40 +76,14 @@ if USAR_POSTGRES:
     from psycopg2.extras import RealDictCursor
 
 def get_db():
-    if has_request_context():
-        if 'db' not in g:
-            if USAR_POSTGRES:
-                import psycopg2
-                g.db = psycopg2.connect(DATABASE_URL)
-                g.db.autocommit = True
-            else:
-                import sqlite3
-                g.db = sqlite3.connect('banco.db')
-                g.db.row_factory = sqlite3.Row
-        return g.db
+    if USAR_POSTGRES:
+        conn = psycopg2.connect(DATABASE_URL)
+        conn.autocommit = True
+        return conn
     else:
-        # Conexão direta durante o arranque (inicializar_banco) fora do contexto web
-        if USAR_POSTGRES:
-            import psycopg2
-            conn = psycopg2.connect(DATABASE_URL)
-            conn.autocommit = True
-            return conn
-        else:
-            import sqlite3
-            conn = sqlite3.connect('banco.db')
-            conn.row_factory = sqlite3.Row
-            return conn
-
-@app.teardown_appcontext
-def fechar_conexao_db(exception=None):
-    if has_request_context():
-        db = g.pop('db', None)
-        if db is not None:
-            try:
-                db.close()
-            except Exception:
-                pass
-
+        conn = sqlite3.connect('banco.db')
+        conn.row_factory = sqlite3.Row
+        return conn
 
 def executar_comando(sql, params=()):
     conn = get_db()
@@ -130,6 +104,11 @@ def executar_comando(sql, params=()):
     except Exception as e:
         print(f"[ERRO DB EXECUTAR]: {e} | SQL: {sql}")
         raise e
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 def consultar_todos(sql, params=()):
     conn = get_db()
@@ -155,6 +134,11 @@ def consultar_todos(sql, params=()):
     except Exception as e:
         print(f"[ERRO DB CONSULTAR TODOS]: {e} | SQL: {sql}")
         return []
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 def consultar_um(sql, params=()):
     conn = get_db()
@@ -181,12 +165,14 @@ def consultar_um(sql, params=()):
         print(f"[ERRO DB CONSULTAR UM]: {e} | SQL: {sql}")
         return None
     finally:
-        conn.close()
-
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 def migrar_colunas_doutrina():
     conn = get_db()
-    colunas_necessarias = [
+    colunas = [
         ('licao_atual', "TEXT DEFAULT 'Lição 1'"),
         ('congregacao_id', "INTEGER DEFAULT 1"),
         ('classe', "TEXT DEFAULT 'Discipulado'"),
@@ -202,27 +188,28 @@ def migrar_colunas_doutrina():
     try:
         if USAR_POSTGRES:
             with conn.cursor() as cur:
-                for col_name, col_def in colunas_necessarias:
+                for col_name, col_def in colunas:
                     try:
                         cur.execute(f"ALTER TABLE doutrina ADD COLUMN IF NOT EXISTS {col_name} {col_def};")
                     except Exception:
-                        try:
-                            conn.rollback()
-                        except Exception:
-                            pass
+                        pass
         else:
             cur = conn.cursor()
             cur.execute("PRAGMA table_info(doutrina)")
             existentes = [r[1] for r in cur.fetchall()]
-            for col_name, col_def in colunas_necessarias:
+            for col_name, col_def in colunas:
                 if col_name not in existentes:
                     try:
                         cur.execute(f"ALTER TABLE doutrina ADD COLUMN {col_name} {col_def}")
                     except Exception:
                         pass
-            conn.commit()
     except Exception as e:
-        print(f"[AVISO MIGRACAO DOUTRINA]: {e}")
+        print(f"[AVISO MIGRACAO]: {e}")
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 def inicializar_banco():
     is_pg = bool(DATABASE_URL)
