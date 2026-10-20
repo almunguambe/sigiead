@@ -135,7 +135,8 @@ def consultar_todos(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            import psycopg2.extras
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 if params:
                     sql_pg = sql.replace('?', '%s')
                     cur.execute(sql_pg, params)
@@ -159,7 +160,8 @@ def consultar_um(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            import psycopg2.extras
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 if params:
                     sql_pg = sql.replace('?', '%s')
                     cur.execute(sql_pg, params)
