@@ -331,7 +331,7 @@ def injetar_dados():
     cultos = consultar_todos("SELECT * FROM cultos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     convertidos = consultar_todos("SELECT * FROM novos_convertidos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     caixa = consultar_todos("SELECT * FROM caixa WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
-    doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
+    doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? OR congregacao_id IS NULL ORDER BY id DESC", (cid,))
     casamentos = consultar_todos("SELECT * FROM casamentos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     obitos = consultar_todos("SELECT * FROM obitos WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
     
@@ -560,7 +560,7 @@ def index():
     cid = session.get('congregacao_id', 1) or 1
     opcoes = consultar_todos("SELECT * FROM opcoes_sistema")
     if 'doutrina' not in locals():
-        doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
+        doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? OR congregacao_id IS NULL ORDER BY id DESC", (cid,))
 
     professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil IN ('professor', 'pastor') AND congregacao_id = ? ORDER BY nome ASC", (cid,))
     duvidas_pendentes = consultar_todos("""
