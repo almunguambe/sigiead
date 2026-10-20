@@ -673,7 +673,19 @@ def index():
         'total_professores': len(professores_cadastrados),
         'total_duvidas': len(duvidas_pendentes)
     }
-    return render_template('dashboard.html', aba_ativa=aba, plano_relatar=plano_para_relatar)
+    
+    # Consulta de Coletas e Ofertas Eclesiásticas para o Relatório Financeiro
+    coletas_relatorio = consultar_todos("""
+        SELECT * FROM caixa 
+        WHERE tipo = 'Entrada' 
+          AND (categoria LIKE '%Oferta%' OR categoria LIKE '%Dízimo%' OR categoria LIKE '%Coleta%' OR categoria LIKE '%Contribui%')
+        ORDER BY data_operacao DESC, id DESC
+    """)
+    total_coletado = sum(float(c.get('valor', 0) or 0) for c in coletas_relatorio)
+
+    return render_template('dashboard.html',
+                           coletas_relatorio=coletas_relatorio,
+                           total_coletado=total_coletado, aba_ativa=aba, plano_relatar=plano_para_relatar)
 
 # =============================================================================
 # ADMINISTRAÇÃO: REGISTO DE NOVAS CONGREGAÇÕES E CONTAS LOCAIS
