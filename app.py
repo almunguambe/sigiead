@@ -76,14 +76,48 @@ if USAR_POSTGRES:
     from psycopg2.extras import RealDictCursor
 
 def get_db():
-    if USAR_POSTGRES:
-        conn = psycopg2.connect(DATABASE_URL)
-        conn.autocommit = True
-        return conn
+    if has_request_context():
+        conexao_valida = False
+        if 'db' in g:
+            try:
+                if USAR_POSTGRES:
+                    conexao_valida = (getattr(g.db, 'closed', 1) == 0)
+                else:
+                    conexao_valida = True
+            except Exception:
+                conexao_valida = False
+        
+        if not conexao_valida:
+            if USAR_POSTGRES:
+                import psycopg2
+                g.db = psycopg2.connect(DATABASE_URL)
+                g.db.autocommit = True
+            else:
+                import sqlite3
+                g.db = sqlite3.connect('banco.db')
+                g.db.row_factory = sqlite3.Row
+        return g.db
     else:
-        conn = sqlite3.connect('banco.db')
-        conn.row_factory = sqlite3.Row
-        return conn
+        if USAR_POSTGRES:
+            import psycopg2
+            conn = psycopg2.connect(DATABASE_URL)
+            conn.autocommit = True
+            return conn
+        else:
+            import sqlite3
+            conn = sqlite3.connect('banco.db')
+            conn.row_factory = sqlite3.Row
+            return conn
+
+@app.teardown_appcontext
+def fechar_conexao_db(exception=None):
+    if has_request_context():
+        db = g.pop('db', None)
+        if db is not None:
+            try:
+                db.close()
+            except Exception:
+                pass
 
 def executar_comando(sql, params=()):
     conn = get_db()
@@ -103,12 +137,18 @@ def executar_comando(sql, params=()):
                     conn.execute(sql)
     except Exception as e:
         print(f"[ERRO DB EXECUTAR]: {e} | SQL: {sql}")
+        if USAR_POSTGRES:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
         raise e
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+        if not has_request_context():
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 def consultar_todos(sql, params=()):
     conn = get_db()
@@ -133,18 +173,23 @@ def consultar_todos(sql, params=()):
             return [dict(r) for r in res]
     except Exception as e:
         print(f"[ERRO DB CONSULTAR TODOS]: {e} | SQL: {sql}")
+        if USAR_POSTGRES:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
         return []
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+        if not has_request_context():
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 def consultar_um(sql, params=()):
     conn = get_db()
     try:
         if USAR_POSTGRES:
-            import psycopg2.extras
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 if params:
                     sql_pg = sql.replace('?', '%s')
@@ -163,12 +208,18 @@ def consultar_um(sql, params=()):
             return dict(res) if res else None
     except Exception as e:
         print(f"[ERRO DB CONSULTAR UM]: {e} | SQL: {sql}")
+        if USAR_POSTGRES:
+            try:
+                conn.rollback()
+            except Exception:
+                pass
         return None
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+        if not has_request_context():
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 def migrar_colunas_doutrina():
     conn = get_db()
@@ -206,10 +257,11 @@ def migrar_colunas_doutrina():
     except Exception as e:
         print(f"[AVISO MIGRACAO]: {e}")
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+        if not has_request_context():
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 def inicializar_banco():
     is_pg = bool(DATABASE_URL)
