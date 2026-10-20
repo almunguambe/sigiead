@@ -31,10 +31,10 @@
         }
     </script>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex">
 
     <!-- MENU LATERAL COM O LOGO OFICIAL -->
-    <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
+    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-3">
                 <div class="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center shrink-0 shadow">
@@ -47,29 +47,7 @@
                 </div>
             </div>
 
-                                                
-            {% if usuario_logado and usuario_logado.perfil == 'professor' %}
-            <!-- MENU EXCLUSIVO DA ÁREA DO PROFESSOR -->
-            <div class="space-y-4 mb-4">
-                <div class="px-3 py-1.5 bg-amber-500/20 border border-amber-400/30 rounded-xl">
-                    <span class="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
-                        👨‍🏫 Gabinete do Instrutor
-                    </span>
-                    <span class="text-xs font-bold text-white block mt-0.5 truncate">{{ usuario_logado.nome }}</span>
-                </div>
-                <nav class="space-y-1.5">
-                    <a href="/?aba=doutrina" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition bg-amber-600 text-white shadow-md font-bold text-xs">
-                        <span class="text-base">📖</span>
-                        <span>Minhas Classes & Alunos</span>
-                    </a>
-                    <a href="/ensino/aulas" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 transition text-xs font-medium">
-                        <span class="text-base">🎓</span>
-                        <span>Sala de Aulas Virtual ↗</span>
-                    </a>
-                </nav>
-            </div>
-            {% else %}
-<nav class="p-3 space-y-1 text-xs font-semibold">
+                                                <nav class="p-3 space-y-1 text-xs font-semibold">
                 
                 <!-- VISÃO GERAL: LIDERANÇA E ADMIN -->
                 {% if usuario_logado and usuario_logado.perfil in ['admin', 'pastor', 'lideranca'] %}
@@ -147,11 +125,10 @@
                 <span>🚪</span><span>Sair</span>
             </a>
         </div>
-    {% endif %}
-        </aside>
+    </aside>
 
     <!-- ÁREA PRINCIPAL -->
-    <main class="flex-1 p-6 overflow-y-auto w-full min-w-0 overflow-x-hidden">
+    <main class="flex-1 p-6 overflow-y-auto">
             <!-- SELETOR DINÂMICO DE CONGREGAÇÃO (VISÍVEL APENAS PARA ADMIN GERAL) -->
             {% if usuario_logado and usuario_logado.usuario == 'admin' and congregacoes_todas|length > 1 %}
             <div class="mb-4 bg-indigo-50 border-2 border-indigo-200 p-3 rounded-2xl flex items-center justify-between text-xs">
