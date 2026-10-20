@@ -102,32 +102,7 @@
                 {% if usuario_logado and usuario_logado.perfil in ['admin', 'pastor', 'lideranca'] %}
                 <div class="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">Ensino & Formação</div>
 
-                <a href="/?aba=doutrina" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'doutrina' %}
-
-        <!-- 4 CARDS: SITUAÇÃO GERAL DE ENSINO (DASHBOARD PEDAGÓGICO) -->
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-indigo-600 border-slate-200">
-                <span class="text-slate-500 text-[10px] font-bold uppercase block">Total de Formandos</span>
-                <span class="text-2xl font-black text-indigo-950 mt-1 block">{{ doutrina|length }} Alunos</span>
-                <span class="text-[10px] text-slate-400">Inscritos no currículo oficial</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500 border-slate-200">
-                <span class="text-slate-500 text-[10px] font-bold uppercase block">Aptos / Batismo</span>
-                <span class="text-2xl font-black text-emerald-700 mt-1 block">🌊 {{ doutrina|selectattr('situacao', 'equalto', 'Apto / Aprovado')|list|length }} Prontos</span>
-                <span class="text-[10px] text-emerald-600 font-bold">Aproveitamento >= 70%</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500 border-slate-200">
-                <span class="text-slate-500 text-[10px] font-bold uppercase block">Em Formação Ativa</span>
-                <span class="text-2xl font-black text-amber-700 mt-1 block">📖 {{ doutrina|rejectattr('situacao', 'equalto', 'Apto / Aprovado')|list|length }} Alunos</span>
-                <span class="text-[10px] text-slate-400">Em estudo nas classes</span>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-blue-500 border-slate-200">
-                <span class="text-slate-500 text-[10px] font-bold uppercase block">Corpo Docente</span>
-                <span class="text-2xl font-black text-blue-900 mt-1 block">👨‍🏫 {{ professores_cadastrados|length if professores_cadastrados is defined and professores_cadastrados else 1 }} Instrutor(es)</span>
-                <span class="text-[10px] text-slate-400">Docentes credenciados</span>
-            </div>
-        </div>
-bg-amber-700 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
+                <a href="/?aba=doutrina" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'doutrina' %}bg-amber-700 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
                     <span>📖</span><span>7. Doutrina & Batismo</span>
                 </a>
                 {% endif %}
@@ -1484,6 +1459,31 @@ bg-amber-700 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% e
         <!-- ABA 7: DOUTRINA & BATISMO (COM GABINETE DO PROFESSOR)     -->
         <!-- ========================================================= -->
         {% if aba_ativa == 'doutrina' %}
+
+        <!-- 4 CARDS: SITUAÇÃO GERAL DE ENSINO (DASHBOARD PEDAGÓGICO) -->
+        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-xs">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-indigo-600 border-slate-200">
+                <span class="text-slate-500 text-[10px] font-bold uppercase block">Total de Formandos</span>
+                <span class="text-2xl font-black text-indigo-950 mt-1 block">{{ doutrina|length }} Alunos</span>
+                <span class="text-[10px] text-slate-400">Inscritos no currículo oficial</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500 border-slate-200">
+                <span class="text-slate-500 text-[10px] font-bold uppercase block">Aptos / Batismo</span>
+                <span class="text-2xl font-black text-emerald-700 mt-1 block">🌊 {{ doutrina|selectattr('situacao', 'equalto', 'Apto / Aprovado')|list|length }} Prontos</span>
+                <span class="text-[10px] text-emerald-600 font-bold">Aproveitamento >= 70%</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-amber-500 border-slate-200">
+                <span class="text-slate-500 text-[10px] font-bold uppercase block">Em Formação Ativa</span>
+                <span class="text-2xl font-black text-amber-700 mt-1 block">📖 {{ doutrina|rejectattr('situacao', 'equalto', 'Apto / Aprovado')|list|length }} Alunos</span>
+                <span class="text-[10px] text-slate-400">Em estudo nas classes</span>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-blue-500 border-slate-200">
+                <span class="text-slate-500 text-[10px] font-bold uppercase block">Corpo Docente</span>
+                <span class="text-2xl font-black text-blue-900 mt-1 block">👨‍🏫 {{ professores_cadastrados|length if professores_cadastrados is defined and professores_cadastrados else 1 }} Instrutor(es)</span>
+                <span class="text-[10px] text-slate-400">Docentes credenciados</span>
+            </div>
+        </div>
+
         <div class="bg-amber-950 text-white p-6 rounded-2xl shadow mb-6 flex justify-between items-center">
             <div>
                 <h2 class="text-2xl font-black">📖 Dashboard de Doutrina & Preparação Batismal</h2>
