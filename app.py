@@ -539,7 +539,7 @@ def index():
     if 'doutrina' not in locals():
         doutrina = consultar_todos("SELECT * FROM doutrina WHERE congregacao_id = ? ORDER BY id DESC", (cid,))
 
-    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil = 'professor' AND congregacao_id = ? ORDER BY nome ASC", (cid,))
+    professores_cadastrados = consultar_todos("SELECT * FROM usuarios_sistema WHERE perfil IN ('professor', 'pastor') AND congregacao_id = ? ORDER BY nome ASC", (cid,))
     duvidas_pendentes = consultar_todos("""
         SELECT d.*, a.nome_aluno as aluno_nome 
         FROM duvidas_alunos d 

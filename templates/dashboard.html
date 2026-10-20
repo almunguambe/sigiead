@@ -1552,8 +1552,17 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-700 mb-1 text-xs">Instrutor / Mentor</label>
-                            <input type="text" name="professor" placeholder="Pr. / Diác. / Instrutor" class="w-full h-11 px-3 border border-slate-300 rounded-xl bg-white font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm">
+                            <label class="block font-bold text-slate-700 mb-1 text-xs">Instrutor / Mentor *</label>
+                            <select name="professor" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-bold text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer truncate">
+                                <option value="" disabled {% if not usuario_logado or usuario_logado.perfil not in ['professor', 'pastor'] %}selected{% endif %}>Selecione o Instrutor / Mentor...</option>
+                                {% if professores_cadastrados %}
+                                    {% for p in professores_cadastrados %}
+                                    <option value="{{ p.nome }}" {% if usuario_logado and usuario_logado.nome == p.nome %}selected{% endif %}>👨‍🏫 {{ p.nome }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                                <option value="Anselmo Leonardo Munguambe" {% if usuario_logado and usuario_logado.nome == 'Anselmo Leonardo Munguambe' %}selected{% endif %}>👨‍🏫 Anselmo Leonardo Munguambe</option>
+                                <option value="Pastor Dirigente" {% if usuario_logado and usuario_logado.nome == 'Pastor Dirigente' %}selected{% endif %}>👨‍🏫 Pastor Dirigente</option>
+                            </select>
                         </div>
                     </div>
 
