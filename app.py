@@ -76,14 +76,25 @@ if USAR_POSTGRES:
     from psycopg2.extras import RealDictCursor
 
 def get_db():
-    if USAR_POSTGRES:
-        conn = psycopg2.connect(DATABASE_URL)
-        conn.autocommit = True  # Garante gravação imediata no Supabase
-        return conn
-    else:
-        conn = sqlite3.connect('igreja.db')
-        conn.row_factory = sqlite3.Row
-        return conn
+    if 'db' not in g:
+        if USAR_POSTGRES:
+            import psycopg2
+            g.db = psycopg2.connect(DATABASE_URL)
+            g.db.autocommit = True
+        else:
+            import sqlite3
+            g.db = sqlite3.connect('banco.db')
+            g.db.row_factory = sqlite3.Row
+    return g.db
+
+@app.teardown_appcontext
+def fechar_conexao_db(exception=None):
+    db = g.pop('db', None)
+    if db is not None:
+        try:
+            db.close()
+        except Exception:
+            pass
 
 def executar_comando(sql, params=()):
     conn = get_db()
@@ -95,7 +106,6 @@ def executar_comando(sql, params=()):
                     cur.execute(sql_pg, params)
                 else:
                     cur.execute(sql)
-            conn.commit()
         else:
             with conn:
                 if params:
@@ -105,8 +115,6 @@ def executar_comando(sql, params=()):
     except Exception as e:
         print(f"[ERRO DB EXECUTAR]: {e} | SQL: {sql}")
         raise e
-    finally:
-        conn.close()
 
 def consultar_todos(sql, params=()):
     conn = get_db()
@@ -131,8 +139,6 @@ def consultar_todos(sql, params=()):
     except Exception as e:
         print(f"[ERRO DB CONSULTAR TODOS]: {e} | SQL: {sql}")
         return []
-    finally:
-        conn.close()
 
 def consultar_um(sql, params=()):
     conn = get_db()
