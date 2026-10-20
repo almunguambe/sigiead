@@ -2,7 +2,7 @@ import os
 import sqlite3
 from datetime import datetime
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, g, has_request_context
 
 app = Flask(__name__)
 
@@ -76,25 +76,40 @@ if USAR_POSTGRES:
     from psycopg2.extras import RealDictCursor
 
 def get_db():
-    if 'db' not in g:
+    if has_request_context():
+        if 'db' not in g:
+            if USAR_POSTGRES:
+                import psycopg2
+                g.db = psycopg2.connect(DATABASE_URL)
+                g.db.autocommit = True
+            else:
+                import sqlite3
+                g.db = sqlite3.connect('banco.db')
+                g.db.row_factory = sqlite3.Row
+        return g.db
+    else:
+        # Conexão direta durante o arranque (inicializar_banco) fora do contexto web
         if USAR_POSTGRES:
             import psycopg2
-            g.db = psycopg2.connect(DATABASE_URL)
-            g.db.autocommit = True
+            conn = psycopg2.connect(DATABASE_URL)
+            conn.autocommit = True
+            return conn
         else:
             import sqlite3
-            g.db = sqlite3.connect('banco.db')
-            g.db.row_factory = sqlite3.Row
-    return g.db
+            conn = sqlite3.connect('banco.db')
+            conn.row_factory = sqlite3.Row
+            return conn
 
 @app.teardown_appcontext
 def fechar_conexao_db(exception=None):
-    db = g.pop('db', None)
-    if db is not None:
-        try:
-            db.close()
-        except Exception:
-            pass
+    if has_request_context():
+        db = g.pop('db', None)
+        if db is not None:
+            try:
+                db.close()
+            except Exception:
+                pass
+
 
 def executar_comando(sql, params=()):
     conn = get_db()
