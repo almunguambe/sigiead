@@ -679,7 +679,7 @@ def index():
         SELECT * FROM caixa 
         WHERE tipo = 'Entrada' 
           AND (categoria LIKE '%Oferta%' OR categoria LIKE '%Dízimo%' OR categoria LIKE '%Coleta%' OR categoria LIKE '%Contribui%')
-        ORDER BY data_operacao DESC, id DESC
+        ORDER BY id DESC, id DESC
     """)
     total_coletado = sum(float(c.get('valor', 0) or 0) for c in coletas_relatorio)
 
