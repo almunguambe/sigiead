@@ -559,58 +559,42 @@ def aluno_logout():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    erro = None
     if request.method == 'POST':
-        usuario = request.form.get('usuario', '').strip().lower()
-        senha = request.form.get('senha', '').strip()
+        u = request.form.get('usuario', '').strip()
+        s = request.form.get('senha', '').strip()
+        user = None
+        
+        # Tentativa 1: PostgreSQL / Supabase (%s)
+        try:
+            user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(%s) AND senha = %s", (u, s))
+        except Exception:
+            # Tentativa 2: SQLite (?)
+            try:
+                user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(?) AND senha = ?", (u, s))
+            except Exception as err:
+                print("Erro na consulta de login:", err)
+                user = None
 
-        # 1. Aluno / Estudante
-        aluno = consultar_um("SELECT * FROM doutrina WHERE LOWER(usuario) = ? AND senha = ?", (usuario, senha))
-        if aluno:
-            session.clear()
-            session['aluno_id'] = aluno['id']
-            session['aluno_nome'] = aluno['nome_aluno']
-            session['usuario_perfil'] = 'aluno'
-            session['congregacao_id'] = aluno.get('congregacao_id', 1)
-            return redirect('/ensino/aulas')
+        if user:
+            session['usuario'] = dict(user)
+            perfil = str(user.get('perfil', '')).lower()
+            
+            # Se for professor, entra direto em Doutrina
+            if any(p in perfil for p in ['prof', 'docente', 'instrutor']):
+                return redirect('/?aba=doutrina')
+            
+            # Administrador entra no Dashboard geral
+            return redirect('/?aba=dashboard')
+        
+        flash('Utilizador ou palavra-passe incorretos.', 'danger')
+    return render_template('login.html')
 
-        # 2. Utilizadores Administrativos
-        u = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = ? AND senha = ?", (usuario, senha))
-        if u:
-            session.clear()
-            session['usuario_id'] = u['id']
-            session['usuario_nome'] = u['nome']
-            session['usuario_perfil'] = u['perfil']
-            session['usuario_nivel'] = u.get('nivel', 'local')
-            session['congregacao_id'] = u.get('congregacao_id', 1)
-
-            if u['perfil'] == 'tesoureiro':
-                return redirect('/?aba=tesouraria')
-            elif u['perfil'] == 'secretario':
-                return redirect('/?aba=membros')
-            elif u['perfil'] in ['lideranca', 'pastor']:
-                return redirect('/?aba=dashboard')
-            else:
-                return redirect('/?aba=dashboard')
-        else:
-            erro = "Credenciais inválidas! Verifique o utilizador e a palavra-passe."
-
-    
-
-
-    return render_template('login.html', erro=erro)
 
 @app.route('/')
 def index():
     if not session.get('usuario'):
         return redirect(url_for('login'))
     
-    # REDIRECIONAR PROFESSOR AUTOMATICAMENTE PARA DOUTRINA
-    _u = session.get('usuario') or {}
-    _perfil = str(_u.get('perfil', '')).lower()
-    if any(p in _perfil for p in ['prof', 'docente', 'instrutor']):
-        if request.args.get('aba') != 'doutrina':
-            return redirect('/?aba=doutrina')
     usuario = session.get('usuario')
     doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
     try:
