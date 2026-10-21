@@ -602,6 +602,10 @@ def login():
 
 @app.route('/')
 def index():
+    # REDIRECIONAR PROFESSOR PARA A SUA ÁREA EXCLUSIVA
+    u_sess = session.get('usuario') or {}
+    if any(p in str(u_sess.get('perfil', '')).lower() for p in ['prof', 'docente', 'instrutor']):
+        return redirect('/professor')
     if not session.get('usuario_id') and not session.get('aluno_id'):
         return redirect('/login')
 

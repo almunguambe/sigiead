@@ -12,7 +12,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- CABEÇALHO DO PROFESSOR (100% RESPONSIVO) -->
+    <!-- CABEÇALHO DO PROFESSOR (100% LARGURA, SEM BARRA LATERAL) -->
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -27,50 +27,49 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div class="text-right hidden sm:block">
-                    <span class="text-xs font-bold text-white block">{{ usuario_logado.nome if usuario_logado else 'Professor' }}</span>
-                    <span class="text-[10px] text-slate-400 block uppercase">Doutrina & Batismo</span>
-                </div>
-                <a href="/logout" class="px-3.5 py-1.5 bg-rose-600/90 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <span class="text-[10px] font-black px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                    Professor
+                </span>
+                <a href="/logout" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1">
                     <span>Sair</span>
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL (100% DE LARGURA NO TELEMÓVEL) -->
-    <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6">
+    <!-- CONTEÚDO PRINCIPAL (100% DA LARGURA NO TELEMÓVEL) -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-5">
 
-        <!-- BOAS-VINDAS / BANNER DO PROFESSOR -->
+        <!-- BANNER DE BOAS-VINDAS -->
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1">
-                <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
-                    <span>👨‍🏫</span> Painel de Ensino & Acompanhamento
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                    <span>👨‍🏫</span> Gabinete Pedagógico
                 </div>
                 <h2 class="text-xl sm:text-2xl font-black text-white">
                     Paz do Senhor, {{ usuario_logado.nome.split()[0] if usuario_logado and usuario_logado.nome else 'Professor' }}!
                 </h2>
                 <p class="text-xs text-slate-300 max-w-xl">
-                    Faça o acompanhamento das suas classes de discipulado, batismo e maturidade cristã da Igreja de Chicuque.
+                    Painel de acompanhamento pedagógico das suas turmas de Doutrina, Batismo e Discipulado da Igreja de Chicuque.
                 </p>
             </div>
             <div>
                 <a href="/ensino/aulas" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
                     <span>🎓</span>
-                    <span>Aceder à Sala Virtual do Aluno ↗</span>
+                    <span>Sala Virtual do Aluno ↗</span>
                 </a>
             </div>
         </div>
 
-        <!-- CARDS DE INDICADORES RÁPIDOS DA CLASSE -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs">
+        <!-- INDICADORES DA TURMA -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Total Formandos</span>
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Formandos Inscritos</span>
                 <span class="text-2xl sm:text-3xl font-black text-slate-900 block mt-1">
                     {{ doutrina|length if doutrina else 0 }}
                 </span>
-                <span class="text-[10px] text-emerald-600 font-bold block mt-0.5">● Alunos Inscritos</span>
+                <span class="text-[10px] text-emerald-600 font-bold block mt-0.5">● Alunos na Turma</span>
             </div>
 
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
@@ -86,20 +85,20 @@
                 <span class="text-2xl sm:text-3xl font-black text-amber-600 block mt-1">
                     {{ duvidas|length if duvidas else 0 }}
                 </span>
-                <span class="text-[10px] text-slate-500 font-medium block mt-0.5">Mensagens dos alunos</span>
+                <span class="text-[10px] text-slate-500 font-medium block mt-0.5">Mensagens pendentes</span>
             </div>
 
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Estado da Turma</span>
-                <span class="text-lg font-black text-emerald-700 block mt-1 truncate">
-                    Em Progresso
+                <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Ano Eclesiástico</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-800 block mt-1">
+                    2026
                 </span>
-                <span class="text-[10px] text-slate-500 font-medium block mt-0.5">Ano Letivo 2026</span>
+                <span class="text-[10px] text-slate-500 font-medium block mt-0.5">Igreja de Chicuque</span>
             </div>
         </div>
 
         <!-- GABINETE DE DÚVIDAS BÍBLICAS -->
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">💬</span>
@@ -123,20 +122,20 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="p-6 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
-                    Nenhuma dúvida bíblica enviada pelos formandos até ao momento.
+                <div class="p-5 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                    Nenhuma dúvida bíblica enviada pelos formandos no momento.
                 </div>
             {% endif %}
         </div>
 
-        <!-- LISTA DE FORMANDOS & ACOMPANHAMENTO (SEM OPÇÕES DE CADASTRO) -->
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <!-- LISTA DE FORMANDOS & TURMAS (SEM BOTÕES DE CADASTRO) -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">📋</span>
                     <div>
                         <h3 class="font-black text-sm text-slate-900 uppercase">Lista de Formandos & Turmas</h3>
-                        <p class="text-[11px] text-slate-400">Alunos sob sua supervisão pedagógica</p>
+                        <p class="text-[11px] text-slate-400">Acompanhamento dos formandos alocados</p>
                     </div>
                 </div>
                 <span class="text-xs font-bold text-indigo-900 bg-indigo-50 px-3 py-1 rounded-xl self-start sm:self-auto">
@@ -149,7 +148,7 @@
                     <thead>
                         <tr class="bg-slate-100 text-slate-700 font-bold uppercase text-[10px]">
                             <th class="p-3">Aluno</th>
-                            <th class="p-3">Turma / Classe</th>
+                            <th class="p-3">Classe</th>
                             <th class="p-3">Mentor / Instrutor</th>
                             <th class="p-3">Lição Atual</th>
                             <th class="p-3 text-center">Presenças</th>
@@ -189,8 +188,8 @@
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="6" class="p-8 text-center text-slate-400 italic">
-                                    Nenhum formando alocado a esta congregação.
+                                <td colspan="6" class="p-6 text-center text-slate-400 italic">
+                                    Nenhum formando inscrito no momento.
                                 </td>
                             </tr>
                         {% endif %}
