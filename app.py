@@ -606,3 +606,17 @@ def index():
                            doutrina=doutrina,
                            duvidas=duvidas)
 
+
+@app.route('/ensino/aulas')
+def sala_aulas_virtual():
+    if not session.get('usuario'):
+        return redirect(url_for('login'))
+    usuario = session.get('usuario')
+    try:
+        doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    except Exception:
+        doutrina = []
+    return render_template('ensino_aulas.html',
+                           usuario_logado=usuario,
+                           doutrina=doutrina)
+
