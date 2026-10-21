@@ -33,8 +33,32 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex">
 
+    <!-- CABEÇALHO COMPACTO PARA DISPOSITIVOS MÓVEIS -->
+    <header class="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center font-black text-amber-400 text-sm">
+                📖
+            </div>
+            <div>
+                <span class="font-black text-xs text-white tracking-tight block">SIGIEAD • Chicuque</span>
+                <span class="text-[9px] text-amber-400 font-bold block -mt-0.5">
+                    {{ usuario_logado.nome if usuario_logado else 'Utilizador' }}
+                </span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 uppercase">
+                {{ usuario_logado.perfil if usuario_logado else 'Docente' }}
+            </span>
+            <a href="/logout" class="px-2.5 py-1 bg-rose-600 text-white hover:bg-rose-700 rounded-lg text-xs font-bold transition shadow-sm">
+                Sair
+            </a>
+        </div>
+    </header>
+
+
     <!-- MENU LATERAL COM O LOGO OFICIAL -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
+    <aside class="hidden md:flex md:w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-3">
                 <div class="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center shrink-0 shadow">
@@ -1130,7 +1154,7 @@
                 </form>
             </div>
 
-            <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div class="{% if usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower) %}lg:col-span-12 w-full{% else %}lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200{% endif %}">
                 <h3 class="font-bold text-base mb-4 border-b pb-2">📚 Histórico de Cultos ({{ cultos|length }})</h3>
                 <div class="">
                     <table class="w-full text-left text-xs">
@@ -1851,7 +1875,8 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            {% if not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower or 'instrutor' in usuario_logado.perfil|lower)) %}
+<div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h3 class="font-bold text-base mb-4 border-b pb-2">🎓 Inscrever Formando com Login</h3>
                 <form action="/doutrina/novo" method="POST" class="space-y-3 text-xs">
                     <div>
@@ -1912,10 +1937,12 @@
                 <div class="mt-6 pt-5 border-t border-slate-200 space-y-3">
                     <div class="flex items-center gap-2">
                         <span class="text-base">👨‍🏫</span>
-                        <div>
+                        {% if not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower or 'instrutor' in usuario_logado.perfil|lower)) %}
+<div>
                             <h4 class="font-black text-xs text-slate-900 uppercase">Cadastrar Novo Professor / Instrutor</h4>
                             <p class="text-[10px] text-slate-500">Credencie um instrutor com acesso restrito ao ensino</p>
                         </div>
+{% endif %}
                     </div>
                     <form action="/doutrina/gravar_professor" method="POST" class="space-y-2 text-xs">
                         <input type="text" name="nome_professor" required placeholder="Nome Completo do Instrutor" class="w-full h-10 px-3 border border-slate-300 rounded-xl focus:border-indigo-600 focus:outline-none">
@@ -1928,6 +1955,7 @@
                         </button>
                     </form>
                 </div>
+{% endif %}
             </div>
 
             <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">

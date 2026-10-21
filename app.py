@@ -1621,6 +1621,11 @@ def area_professor():
         return redirect(url_for('login', next='/professor'))
         return redirect(url_for('login'))
     usuario = session.get('usuario')
+
+    # RESTRINGIR PROFESSOR: APENAS ACESSO A DOUTRINA
+    perfil_atual = str(usuario.get('perfil', '')).lower() if 'usuario' in locals() and usuario else ''
+    if any(p in perfil_atual for p in ['prof', 'docente', 'instrutor']):
+        aba_ativa = 'doutrina'
     if any(p in str(usuario.get('perfil', '')).lower() for p in ['prof', 'docente', 'instrutor']):
         return redirect('/professor')
     doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
