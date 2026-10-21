@@ -136,10 +136,10 @@
                 <div class="pt-3 px-3 py-1 text-[10px] font-black text-slate-400 uppercase tracking-wider">
                     Finanças & Tesouraria
                 </div>
-                <a href="/?aba=financeiro" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs {% if aba_ativa == 'financeiro' %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} transition">
+                <a href="/?aba=financeiro" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs {% if aba_ativa in ['tesouraria', 'caixa', 'financeiro'] %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} transition">
                     <span>📊</span> <span>5. Dashboard Financeiro</span>
                 </a>
-                <a href="/?aba=caixa" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs {% if aba_ativa == 'caixa' %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} transition">
+                <a href="/?aba=caixa" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs {% if aba_ativa in ['tesouraria', 'caixa', 'financeiro'] %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:text-white hover:bg-slate-800{% endif %} transition">
                     <span>🔒</span> <span>6. Caixa & Lançamentos</span>
                 </a>
 
@@ -1607,7 +1607,7 @@
         <!-- ========================================================= -->
         <!-- ABA 6: CAIXA & TESOURARIA (EXCLUSIVO TESOURARIA E ADMIN)  -->
         <!-- ========================================================= -->
-        {% if aba_ativa == 'tesouraria' and usuario_logado.perfil in ['tesoureiro', 'admin'] %}
+        {% if aba_ativa in ['tesouraria', 'caixa', 'financeiro'] %}
         <div class="bg-amber-950 text-white p-6 rounded-2xl shadow mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <div class="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full text-[10px] font-black uppercase mb-1 border border-amber-400/30">
