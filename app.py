@@ -683,6 +683,10 @@ def index():
     """)
     total_coletado = sum(float(c.get('valor', 0) or 0) for c in coletas_relatorio)
 
+    
+    # FIX DEFINITIVO: Professor NUNCA recebe dashboard; recebe SEMPRE doutrina
+    if usuario and any(c in str(usuario.get('perfil', '')).lower() for c in ['professor', 'docente', 'instrutor']):
+        aba_ativa = 'doutrina'
     return render_template('dashboard.html',
                            coletas_relatorio=coletas_relatorio,
                            total_coletado=total_coletado, aba_ativa=aba, plano_relatar=plano_para_relatar)

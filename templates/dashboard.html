@@ -31,47 +31,9 @@
         }
     </script>
 
-    <!-- CSS GLOBAL ANTI-BARRA PRETA: PROÍBE SCROLLBAR EM SELECTS NO CHROME -->
-    <style>
-        select, select::-webkit-scrollbar {
-            overflow: hidden !important;
-            overflow-x: hidden !important;
-            scrollbar-width: none !important;
-            -ms-overflow-style: none !important;
-        }
-        select::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none !important;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
+    
 
-    <!-- SUPRESSÃO DEFINITIVA DE BARRAS DE ROLAGEM PRETAS EM SELECTS -->
-    <style>
-        select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1em 1em;
-            padding-right: 2.25rem !important;
-            overflow: hidden !important;
-        }
-        select::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
-    </style>
+    
 </head>
 
 
@@ -150,7 +112,7 @@
                 <!-- VISÃO GERAL: LIDERANÇA E ADMIN -->
                 {% if usuario_logado and usuario_logado.perfil in ['admin', 'pastor', 'lideranca'] %}
                 <div class="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Visão Geral</div>
-                <a href="/?aba=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'dashboard' %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
+                <a href="/?aba=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'dashboard' and not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower)) %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
                     <span>🔬</span><span>Raio-X Demográfico</span>
                 </a>
                 {% endif %}
@@ -246,7 +208,7 @@
         <!-- ========================================================= -->
         <!-- ABA: RAIO-X ECLESIÁSTICO & DEMOGRAFIA (ZERO FINANÇAS)     -->
         <!-- ========================================================= -->
-        {% if aba_ativa == 'dashboard' %}
+        {% if aba_ativa == 'dashboard' and not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower)) %}
         <!-- CABEÇALHO EXECUTIVO DO RAIO-X DEMOGRÁFICO -->
         <div class="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-3xl shadow-xl mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5 border border-slate-800">
             <div class="flex items-center gap-4">
@@ -975,7 +937,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1 text-xs">Estado Civil *</label>
-                                    <select name="estado_civil" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                    <select name="estado_civil" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none shadow-sm">
                                         <option value="Solteiro(a)">Solteiro(a)</option>
                                         <option value="Casado(a)" selected>Casado(a)</option>
                                         <option value="Viúvo(a)">Viúvo(a)</option>
@@ -984,7 +946,7 @@
                                 </div>
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1 text-xs">Zona Territorial</label>
-                                    <select name="zona" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                    <select name="zona" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none shadow-sm">
                                         <option value="Zona 1 - Chicuque Sede">Zona 1 - Chicuque Sede</option>
                                         <option value="Zona 2 - Chambone">Zona 2 - Chambone</option>
                                         <option value="Zona 3 - Tinga">Zona 3 - Tinga</option>
@@ -995,7 +957,7 @@
                                 </div>
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1 text-xs">Célula Familiar</label>
-                                    <select name="celula" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                    <select name="celula" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none shadow-sm">
                                         <option value="Célula Betel (Chicuque)">Célula Betel (Chicuque)</option>
                                         <option value="Célula Sião (Chambone)">Célula Sião (Chambone)</option>
                                         <option value="Célula Peniel (Tinga)">Célula Peniel (Tinga)</option>
@@ -1008,14 +970,14 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1 text-xs">Situação Espiritual / Batismo *</label>
-                                    <select name="baptizado" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                    <select name="baptizado" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none shadow-sm">
                                         <option value="Sim">Baptizado nas Águas (Comunhão)</option>
                                         <option value="Não">Não Baptizado (Em Doutrina / Novo)</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1 text-xs">Ministério / Departamento</label>
-                                    <select name="departamento" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                    <select name="departamento" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none shadow-sm">
                                         <option value="Membro Geral">Membro Geral</option>
                                         <option value="Corpo Pastoral / Obreiro">Corpo Pastoral / Obreiro</option>
                                         <option value="Diaconato">Diaconato</option>
