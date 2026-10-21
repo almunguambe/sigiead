@@ -9,8 +9,6 @@
     <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
-
-    <!-- CABEÇALHO DO PROFESSOR (100% RESPONSIVO, SEM NENHUMA BARRA LATERAL) -->
     <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -26,23 +24,17 @@
             </div>
         </div>
     </header>
-
-    <!-- CONTEÚDO PRINCIPAL (100% DA LARGURA NO TELEMÓVEL) -->
     <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-5">
-
-        <!-- BANNER DE BOAS-VINDAS -->
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="space-y-1">
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider"><span>👨‍🏫</span> Gabinete Pedagógico</div>
                 <h2 class="text-xl sm:text-2xl font-black text-white">Paz do Senhor, {{ usuario_logado.nome.split()[0] if usuario_logado and usuario_logado.nome else 'Professor' }}!</h2>
-                <p class="text-xs text-slate-300 max-w-xl">Painel exclusivo para acompanhamento dos alunos de Doutrina, Batismo e Discipulado da Igreja de Chicuque.</p>
+                <p class="text-xs text-slate-300 max-w-xl">Painel exclusivo para acompanhamento dos formandos de Doutrina, Batismo e Discipulado da Igreja de Chicuque.</p>
             </div>
             <div>
                 <a href="/ensino/aulas" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2"><span>🎓</span><span>Sala Virtual do Aluno ↗</span></a>
             </div>
         </div>
-
-        <!-- INDICADORES DA TURMA -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <span class="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Formandos Inscritos</span>
@@ -65,8 +57,6 @@
                 <span class="text-[10px] text-slate-500 font-medium block mt-0.5">Igreja de Chicuque</span>
             </div>
         </div>
-
-        <!-- GABINETE DE DÚVIDAS BÍBLICAS -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2"><span class="text-lg">💬</span><h3 class="font-black text-sm text-slate-900 uppercase">Gabinete de Dúvidas Bíblicas</h3></div>
@@ -85,8 +75,6 @@
                 <div class="p-5 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200">Nenhuma dúvida bíblica enviada pelos formandos no momento.</div>
             {% endif %}
         </div>
-
-        <!-- LISTA DE FORMANDOS & TURMAS (SEM BOTÕES DE CADASTRO) -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                 <div class="flex items-center gap-2"><span class="text-lg">📋</span><div><h3 class="font-black text-sm text-slate-900 uppercase">Lista de Formandos & Turmas</h3><p class="text-[11px] text-slate-400">Acompanhamento dos formandos alocados</p></div></div>

@@ -563,30 +563,21 @@ def login():
         u = request.form.get('usuario', '').strip()
         s = request.form.get('senha', '').strip()
         user = None
-        
-        # Tentativa 1: PostgreSQL / Supabase (%s)
         try:
             user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(%s) AND senha = %s", (u, s))
         except Exception:
-            # Tentativa 2: SQLite (?)
             try:
                 user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(?) AND senha = ?", (u, s))
-            except Exception as err:
-                print("Erro na consulta de login:", err)
+            except Exception as e:
                 user = None
 
         if user:
             session['usuario'] = dict(user)
             perfil = str(user.get('perfil', '')).lower()
-            
-            # Se for professor, entra direto em Doutrina
             if any(p in perfil for p in ['prof', 'docente', 'instrutor']):
-                return redirect('/?aba=doutrina')
-            
-            # Administrador entra no Dashboard geral
+                return redirect('/professor')
             return redirect('/?aba=dashboard')
-        
-        flash('Utilizador ou palavra-passe incorretos.', 'danger')
+        flash('Credenciais incorretas.', 'danger')
     return render_template('login.html')
 
 
@@ -594,15 +585,28 @@ def login():
 def index():
     if not session.get('usuario'):
         return redirect(url_for('login'))
-    
     usuario = session.get('usuario')
-    doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    perfil = str(usuario.get('perfil', '')).lower()
+    
+    # SE FOR PROFESSOR: vai para a sua tela /professor
+    if any(p in perfil for p in ['prof', 'docente', 'instrutor']):
+        return redirect('/professor')
+        
+    aba_ativa = request.args.get('aba', 'dashboard')
+    
+    # Carregar dados normais para o Administrador
+    try:
+        doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    except Exception:
+        doutrina = []
     try:
         duvidas = consultar_todos("SELECT * FROM duvidas_alunos ORDER BY id DESC")
     except Exception:
         duvidas = []
-    return render_template('area_professor.html',
+        
+    return render_template('dashboard.html',
                            usuario_logado=usuario,
+                           aba_ativa=aba_ativa,
                            doutrina=doutrina,
                            duvidas=duvidas)
 
@@ -620,3 +624,20 @@ def sala_aulas_virtual():
                            usuario_logado=usuario,
                            doutrina=doutrina)
 
+@app.route('/professor')
+def area_professor():
+    if not session.get('usuario'):
+        return redirect(url_for('login'))
+    usuario = session.get('usuario')
+    try:
+        doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    except Exception:
+        doutrina = []
+    try:
+        duvidas = consultar_todos("SELECT * FROM duvidas_alunos ORDER BY id DESC")
+    except Exception:
+        duvidas = []
+    return render_template('area_professor.html',
+                           usuario_logado=usuario,
+                           doutrina=doutrina,
+                           duvidas=duvidas)
