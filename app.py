@@ -594,7 +594,11 @@ def index():
         
     aba_ativa = request.args.get('aba', 'dashboard')
     
-    # Carregar dados normais para o Administrador
+        # Carregar dados gerais para o Administrador
+    try:
+        membros = consultar_todos("SELECT * FROM membros ORDER BY id DESC")
+    except Exception:
+        membros = []
     try:
         doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
     except Exception:
@@ -607,6 +611,7 @@ def index():
     return render_template('dashboard.html',
                            usuario_logado=usuario,
                            aba_ativa=aba_ativa,
+                           membros=membros,
                            doutrina=doutrina,
                            duvidas=duvidas)
 

@@ -66,6 +66,29 @@
         }
     </style>
 
+
+    <!-- ESTILO DOS SELETORES: FUNDO BRANCO E SEM BARRAS PRETAS -->
+    <style id="css-seletores-limpos">
+        select {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 0.75rem !important;
+            outline: none !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+        }
+        select option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            padding: 8px 12px !important;
+        }
+        select:focus {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2) !important;
+        }
+    </style>
+
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex">
 
@@ -983,26 +1006,76 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Estado Civil *</label>
-                            <select name="estado_civil" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-bold text-indigo-900">
-                                {% for op in opcoes.get('estado_civil', []) %}
-                                <option value="{{ op.valor }}">{{ op.valor }}</option>
-                                {% endfor %}
+                            
+                    <!-- ESTADO CIVIL, ZONA E CÉLULA COM OPÇÕES COMPLETAS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Estado Civil *</label>
+                            <select name="estado_civil" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-sm" required>
+                                <option value="">Selecione...</option>
+                                <option value="Solteiro(a)">Solteiro(a)</option>
+                                <option value="Casado(a)">Casado(a)</option>
+                                <option value="Viúvo(a)">Viúvo(a)</option>
+                                <option value="Divorciado(a)">Divorciado(a)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Zona</label>
-                            <select name="zona" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('zona', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Zona Territorial</label>
+                            <select name="zona" id="select_zona" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-sm">
+                                <option value="">Selecione a Zona...</option>
+                                <option value="Zona 1 • Chicuque (Sede Central)">Zona 1 • Chicuque (Sede Central)</option>
+                                <option value="Zona 2 • Chambone (Urbano)">Zona 2 • Chambone (Urbano)</option>
+                                <option value="Zona 3 • Tinga (Residencial)">Zona 3 • Tinga (Residencial)</option>
+                                <option value="Zona 4 • Rumbana (Expansão)">Zona 4 • Rumbana (Expansão)</option>
+                                <option value="Zona 5 • Dambo / Malalane">Zona 5 • Dambo / Malalane</option>
+                                <option value="Zona 6 • Macuamene / Bembe">Zona 6 • Macuamene / Bembe</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Célula</label>
-                            <select name="celula" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('celula', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Célula Familiar</label>
+                            <select name="celula" id="select_celula" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-sm">
+                                <option value="">Selecione a Célula...</option>
+                                <option value="Célula Betel (Chicuque)">Célula Betel (Chicuque Sede)</option>
+                                <option value="Célula Sião (Chambone)">Célula Sião (Chambone Centro)</option>
+                                <option value="Célula Peniel (Tinga)">Célula Peniel (Tinga Residencial)</option>
+                                <option value="Célula Ebenézer (Rumbana)">Célula Ebenézer (Rumbana)</option>
+                                <option value="Célula Jerusalém (Agostinho Neto)">Célula Jerusalém (Agostinho Neto)</option>
+                                <option value="Célula Manassés (Dambo)">Célula Manassés (Dambo / Expansão)</option>
                             </select>
                         </div>
                     </div>
+
+                    <!-- CARGO MINISTERIAL E DEPARTAMENTO COM OPÇÕES COMPLETAS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Cargo Ministerial</label>
+                            <select name="cargo" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-sm">
+                                <option value="Membro Comungante">Membro Comungante</option>
+                                <option value="Pastor Dirigente">Pastor Dirigente</option>
+                                <option value="Presbítero / Ancião">Presbítero / Ancião</option>
+                                <option value="Diácono / Diaconisa">Diácono / Diaconisa</option>
+                                <option value="Evangelista">Evangelista</option>
+                                <option value="Missionário(a)">Missionário(a)</option>
+                                <option value="Líder de Célula">Líder de Célula</option>
+                                <option value="Instrutor de Doutrina">Instrutor de Doutrina</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Departamento</label>
+                            <select name="departamento" class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-800 text-xs font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition shadow-sm">
+                                <option value="Geral / Nenhum">Geral / Nenhum</option>
+                                <option value="Homens (Cavalheiros)">Homens (Cavalheiros)</option>
+                                <option value="Mulheres (Senhoras)">Mulheres (Senhoras)</option>
+                                <option value="Juventude Cristã (Jovens)">Juventude Cristã (Jovens)</option>
+                                <option value="Crianças (Boa Esperança)">Crianças (Boa Esperança)</option>
+                                <option value="Louvor & Coral">Louvor & Coral</option>
+                                <option value="Evangelismo & Missões">Evangelismo & Missões</option>
+                                <option value="Ação Social & Diaconia">Ação Social & Diaconia</option>
+                                <option value="Escola Bíblica Dominical">Escola Bíblica Dominical</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1">Cargo Ministerial</label>
