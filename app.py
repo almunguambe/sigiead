@@ -1622,16 +1622,8 @@ if __name__ == '__main__':
 @app.route('/professor')
 def area_professor():
     if not session.get('usuario'):
-        return redirect(url_for('login', next='/professor'))
         return redirect(url_for('login'))
     usuario = session.get('usuario')
-
-    # RESTRINGIR PROFESSOR: APENAS ACESSO A DOUTRINA
-    perfil_atual = str(usuario.get('perfil', '')).lower() if 'usuario' in locals() and usuario else ''
-    if any(p in perfil_atual for p in ['prof', 'docente', 'instrutor']):
-        aba_ativa = 'doutrina'
-    if any(p in str(usuario.get('perfil', '')).lower() for p in ['prof', 'docente', 'instrutor']):
-        return redirect('/professor')
     doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
     try:
         duvidas = consultar_todos("SELECT * FROM duvidas_alunos ORDER BY id DESC")
@@ -1641,3 +1633,4 @@ def area_professor():
                            usuario_logado=usuario,
                            doutrina=doutrina,
                            duvidas=duvidas)
+
