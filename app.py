@@ -1618,6 +1618,7 @@ if __name__ == '__main__':
 @app.route('/professor')
 def area_professor():
     if not session.get('usuario'):
+        return redirect(url_for('login', next='/professor'))
         return redirect(url_for('login'))
     usuario = session.get('usuario')
     if any(p in str(usuario.get('perfil', '')).lower() for p in ['prof', 'docente', 'instrutor']):
