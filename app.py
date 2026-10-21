@@ -563,21 +563,37 @@ def login():
         u = request.form.get('usuario', '').strip()
         s = request.form.get('senha', '').strip()
         user = None
+        
         try:
-            user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(%s) AND senha = %s", (u, s))
+            user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(TRIM(usuario)) = LOWER(TRIM(%s))", (u,))
         except Exception:
             try:
-                user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(usuario) = LOWER(?) AND senha = ?", (u, s))
-            except Exception as e:
+                user = consultar_um("SELECT * FROM usuarios_sistema WHERE LOWER(TRIM(usuario)) = LOWER(TRIM(?))", (u,))
+            except Exception as err:
+                print("Erro de banco no login:", err)
                 user = None
 
         if user:
-            session['usuario'] = dict(user)
-            perfil = str(user.get('perfil', '')).lower()
-            if any(p in perfil for p in ['prof', 'docente', 'instrutor']):
-                return redirect('/professor')
-            return redirect('/?aba=dashboard')
-        flash('Credenciais incorretas.', 'danger')
+            senha_db = str(user.get('senha', '')).strip()
+            senha_valida = (senha_db == s)
+            if not senha_valida:
+                try:
+                    from werkzeug.security import check_password_hash
+                    senha_valida = check_password_hash(senha_db, s)
+                except Exception:
+                    pass
+
+            if senha_valida:
+                session['usuario'] = dict(user)
+                perfil = str(user.get('perfil', '')).lower()
+                if any(p in perfil for p in ['prof', 'docente', 'instrutor']):
+                    return redirect('/professor')
+                return redirect('/?aba=dashboard')
+            else:
+                flash('Palavra-passe incorreta.', 'danger')
+        else:
+            flash('Utilizador não registado no sistema.', 'danger')
+            
     return render_template('login.html')
 
 
