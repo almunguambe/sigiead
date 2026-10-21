@@ -33,6 +33,30 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex">
 
+    <!-- CABEÇALHO MÓVEL PARA TELEMÓVEL -->
+    <header class="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center font-black text-amber-400 text-sm">
+                📖
+            </div>
+            <div>
+                <span class="font-black text-xs text-white tracking-tight block">SIGIEAD • Chicuque</span>
+                <span class="text-[9px] text-amber-400 font-bold block -mt-0.5">
+                    {{ usuario_logado.nome if usuario_logado else 'Área do Professor' }}
+                </span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 uppercase">
+                {{ usuario_logado.perfil if usuario_logado else 'Docente' }}
+            </span>
+            <a href="/logout" class="px-2.5 py-1 bg-rose-600 text-white hover:bg-rose-700 rounded-lg text-xs font-bold transition shadow-sm">
+                Sair
+            </a>
+        </div>
+    </header>
+
+
     <!-- CABEÇALHO COMPACTO PARA DISPOSITIVOS MÓVEIS -->
     <header class="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-md">
         <div class="flex items-center gap-2.5">
@@ -58,7 +82,7 @@
 
 
     <!-- MENU LATERAL COM O LOGO OFICIAL -->
-    <aside class="hidden md:flex md:w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
+    <aside class="hidden md:flex md:hidden md:flex md:w-64 bg-slate-900 text-white flex flex-col justify-between min-h-screen shrink-0 shadow-xl">
         <div>
             <div class="p-4 border-b border-slate-800 flex items-center gap-3">
                 <div class="w-12 h-12 bg-white rounded-full p-1 flex items-center justify-center shrink-0 shadow">
@@ -72,11 +96,29 @@
             </div>
 
                                                 <nav class="p-3 space-y-1 text-xs font-semibold">
+
+        <!-- MENU EXCLUSIVO PARA O PROFESSOR -->
+        {% if usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower or 'instrutor' in usuario_logado.perfil|lower) %}
+        <div class="space-y-2 mb-4">
+            <div class="px-3 py-1 text-[10px] font-black text-amber-400 uppercase tracking-wider">
+                Gabinete Docente
+            </div>
+            <a href="/?aba=doutrina" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs bg-amber-500 text-slate-950 shadow-md">
+                <span class="text-base">📖</span>
+                <span>Minhas Turmas & Alunos</span>
+            </a>
+            <a href="/ensino/aulas" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-slate-300 hover:text-white hover:bg-slate-800 transition">
+                <span class="text-base">🎓</span>
+                <span>Sala Virtual do Aluno ↗</span>
+            </a>
+        </div>
+        {% endif %}
+
                 
                 <!-- VISÃO GERAL: LIDERANÇA E ADMIN -->
                 {% if usuario_logado and usuario_logado.perfil in ['admin', 'pastor', 'lideranca'] %}
                 <div class="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Visão Geral</div>
-                <a href="/?aba=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'dashboard' %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
+                <a href="/?aba=dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition {% if aba_ativa == 'dashboard' and not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower)) %}bg-indigo-600 text-white shadow-md{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
                     <span>🔬</span><span>Raio-X Demográfico</span>
                 </a>
                 {% endif %}
@@ -178,7 +220,7 @@
         <!-- ========================================================= -->
         <!-- ABA: RAIO-X ECLESIÁSTICO & DEMOGRAFIA (ZERO FINANÇAS)     -->
         <!-- ========================================================= -->
-        {% if aba_ativa == 'dashboard' %}
+        {% if aba_ativa == 'dashboard' and not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower)) %}
         <!-- CABEÇALHO EXECUTIVO DO RAIO-X DEMOGRÁFICO -->
         <div class="w-full bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-3xl shadow-xl mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5 border border-slate-800">
             <div class="flex items-center gap-4">
@@ -1160,7 +1202,7 @@
                 </form>
             </div>
 
-            <div class="{% if usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower) %}lg:col-span-12 w-full{% else %}lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200{% endif %}">
+            <div class="{% if usuario_logado and ("professor" in usuario_logado.perfil|lower or "docente" in usuario_logado.perfil|lower) %}lg:col-span-12 w-full{% else %}{% if usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower) %}lg:col-span-12 w-full{% else %}lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200{% endif %}{% endif %}">
                 <h3 class="font-bold text-base mb-4 border-b pb-2">📚 Histórico de Cultos ({{ cultos|length }})</h3>
                 <div class="">
                     <table class="w-full text-left text-xs">

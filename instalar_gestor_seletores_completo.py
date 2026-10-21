@@ -1646,4 +1646,4 @@ with open(os.path.join('templates', 'dashboard.html'), 'w', encoding='utf-8') as
 
 print("=" * 80)
 print(">>> SUCESSO ABSOLUTO: GESTOR DE SELETORES VALIDADO COM ZERO ERROS DE JINJA2! <<<")
-print("=" * 80)
+print("=" * 80) 
