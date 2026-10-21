@@ -1606,3 +1606,20 @@ if __name__ == '__main__':
 # RELATÓRIO FINANCEIRO OFICIAL (A4 / IMPRESSÃO / PDF)
 # =============================================================================
 
+
+@app.route('/professor')
+def area_professor():
+    if not session.get('usuario'):
+        return redirect(url_for('login'))
+    usuario = session.get('usuario')
+    if any(p in str(usuario.get('perfil', '')).lower() for p in ['prof', 'docente', 'instrutor']):
+        return redirect('/professor')
+    doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    try:
+        duvidas = consultar_todos("SELECT * FROM duvidas_alunos ORDER BY id DESC")
+    except Exception:
+        duvidas = []
+    return render_template('area_professor.html',
+                           usuario_logado=usuario,
+                           doutrina=doutrina,
+                           duvidas=duvidas)
