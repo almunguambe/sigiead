@@ -52,7 +52,28 @@
             scrollbar-width: none;
         }
     </style>
+
+    <!-- SUPRESSÃO DEFINITIVA DE BARRAS DE ROLAGEM PRETAS EM SELECTS -->
+    <style>
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em 1em;
+            padding-right: 2.25rem !important;
+            overflow: hidden !important;
+        }
+        select::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+    </style>
 </head>
+
 
 <body class="bg-slate-100 flex flex-col md:flex-row min-h-screen text-slate-800 antialiased font-sans">
 
@@ -89,7 +110,7 @@
                 🎓 Sala Virtual ↗
             </a>
         {% else %}
-            <a href="/?aba=dashboard" class="px-3 py-1.5 rounded-lg font-bold whitespace-nowrap {% if aba_ativa == 'dashboard' %}bg-indigo-600 text-white{% else %}bg-slate-900 text-slate-300{% endif %}">
+            <a href="/?aba=dashboard" class="px-3 py-1.5 rounded-lg font-bold whitespace-nowrap {% if aba_ativa == 'dashboard' and not (usuario_logado and ('professor' in usuario_logado.perfil|lower or 'docente' in usuario_logado.perfil|lower)) %}bg-indigo-600 text-white{% else %}bg-slate-900 text-slate-300{% endif %}">
                 Raio-X
             </a>
             <a href="/?aba=membros" class="px-3 py-1.5 rounded-lg font-bold whitespace-nowrap {% if aba_ativa == 'membros' %}bg-indigo-600 text-white{% else %}bg-slate-900 text-slate-300{% endif %}">
@@ -109,7 +130,6 @@
             </a>
         {% endif %}
     </nav>
->
 
     <!-- MENU LATERAL COM O LOGO OFICIAL -->
     <aside class="hidden md:flex md:w-64 bg-slate-900 text-white min-h-screen p-4 flex-col justify-between shrink-0 shadow-2xl">>
@@ -206,7 +226,7 @@
     </aside>
 
     <!-- ÁREA PRINCIPAL -->
-    <main class="flex-1 w-full min-w-0 p-4 md:p-6 overflow-x-hidden">>
+    <main class="flex-1 w-full min-w-0 p-4 md:p-6 overflow-x-hidden">
             <!-- SELETOR DINÂMICO DE CONGREGAÇÃO (VISÍVEL APENAS PARA ADMIN GERAL) -->
             {% if usuario_logado and usuario_logado.usuario == 'admin' and congregacoes_todas|length > 1 %}
             <div class="mb-4 bg-indigo-50 border-2 border-indigo-200 p-3 rounded-2xl flex items-center justify-between text-xs">
@@ -952,794 +972,61 @@
                         <input type="text" name="contacto" placeholder="+258..." class="w-full h-10 px-3 border rounded-xl bg-slate-50">
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Estado Civil *</label>
-                            <select name="estado_civil" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-bold text-indigo-900">
-                                {% for op in opcoes.get('estado_civil', []) %}
-                                <option value="{{ op.valor }}">{{ op.valor }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Zona</label>
-                            <select name="zona" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('zona', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Célula</label>
-                            <select name="celula" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('celula', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Cargo Ministerial</label>
-                            <select name="cargo" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('cargo', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Departamento</label>
-                            <select name="departamento" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-semibold">
-                                {% for op in opcoes.get('departamento', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Ano Conversão</label>
-                            <input type="number" name="ano_conversao" placeholder="Ex: 2021" class="w-full h-10 px-3 border rounded-xl bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="block font-semibold text-slate-600 mb-1">Data Batismo</label>
-                            <input type="date" name="data_batismo" class="w-full h-10 px-2 border rounded-xl bg-emerald-50 border-emerald-300">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-slate-600 mb-1">Residência (Bairro / Local)</label>
-                        <input type="text" name="local_residencia" placeholder="Ex: Chicuque - Perto do Hospital" class="w-full h-10 px-3 border rounded-xl bg-slate-50">
-                    </div>
-                    <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow cursor-pointer transition">
-                        Gravar Ficha de Membro
-                    </button>
-                </form>
-            </div>
-
-            <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">📋 Membros Registados ({{ membros|length }})</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="border-b-2 border-slate-200 text-slate-500">
-                                <th class="py-2 px-2">Membro</th>
-                                <th class="py-2 px-2">Zona & Célula</th>
-                                <th class="py-2 px-2">Cargo & Depto</th>
-                                <th class="py-2 px-2">Batismo</th>
-                                <th class="py-2 px-2 text-right">Documentos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for m in membros %}
-                            <tr class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-2.5 px-2">
-                                    <div class="font-bold text-slate-900">{{ m.nome }}</div>
-                                    <div class="text-[10px] text-slate-400">{{ m.genero or 'Homem' }} • {{ m.estado_civil or '---' }} • {{ m.local_residencia or m.bairro or '---' }}</div>
-                                </td>
-                                <td class="py-2.5 px-2 text-slate-600">
-                                    <div class="font-semibold">{{ m.zona or 'Zona Geral' }}</div>
-                                    <div class="text-[10px] text-slate-400">{{ m.celula or '---' }}</div>
-                                </td>
-                                <td class="py-2.5 px-2">
-                                    <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold text-[11px]">{{ m.cargo }}</span>
-                                    <div class="text-[10px] text-slate-500 mt-0.5">{{ m.departamento }}</div>
-                                </td>
-                                <td class="py-2.5 px-2">
-                                    {% if m.data_batismo %}
-                                    <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">🌊 {{ m.data_batismo }}</span>
-                                    {% else %}
-                                    <span class="text-slate-400 text-[10px] italic">Não Batizado</span>
-                                    {% endif %}
-                                </td>
-                                <td class="py-2.5 px-2 text-right space-x-1">
-                                    <a href="/membros/{{ m.id }}/cartao" target="_blank" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold text-[10px] shadow inline-block" title="Cartão de Membro">🪪 Cartão</a>
-                                    {% if m.data_batismo %}
-                                    <a href="/membros/{{ m.id }}/batismo" target="_blank" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-[10px] shadow inline-block" title="Certificado de Batismo">🌊 Batismo</a>
-                                    {% endif %}
-                                    <a href="/membros/{{ m.id }}/recomendacao" target="_blank" class="px-2 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded font-bold text-[10px] shadow inline-block" title="Carta de Recomendação">📜 Carta</a>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="5" class="py-8 text-center text-slate-400">Nenhum membro registado.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- ========================================================= -->
-        <!-- ABA 2: SECRETARIA & PLANIFICAÇÃO (COM BALANÇO ANUAL)      -->
-        <!-- ========================================================= -->
-        {% if aba_ativa == 'secretaria' %}
-        <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-xl font-extrabold">📋 Secretaria & Planificação de Actividades</h2>
-                <p class="text-xs text-indigo-200 mt-0.5">Gestão de cronograma, execução de metas e prestação oficial de contas</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2.5">
-                <a href="/secretaria/balanco" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                    <span>🎯</span><span>Balanço Anual & Questionamentos</span>
-                </a>
-                <a href="/secretaria/relatorio-anual" target="_blank" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                    <span>📄</span><span>Emitir Relatório Oficial (2026)</span>
-                </a>
-            </div>
-        </div>
-
-        {% if plano_relatar %}
-        <div class="bg-amber-50 border-2 border-amber-300 p-6 rounded-2xl shadow mb-6">
-            <h3 class="font-extrabold text-base text-amber-900 mb-3">📝 Prestação de Contas: {{ plano_relatar.actividade }}</h3>
-            <form action="/secretaria/planificacao/relatar" method="POST" class="space-y-3.5 text-xs">
-                <input type="hidden" name="plano_id" value="{{ plano_relatar.id }}">
-                <div><label class="block font-bold text-slate-700 mb-1">Feedback do que foi realizado *</label><textarea name="feedback" required rows="3" class="w-full p-3 border rounded-xl bg-white"></textarea></div>
-                <div class="grid grid-cols-4 gap-3 bg-white p-3 rounded-xl border border-amber-200">
-                    <div><label class="block text-slate-500">Homens</label><input type="number" name="participantes_homens" value="0" min="0" class="w-full h-9 px-2 border rounded font-bold"></div>
-                    <div><label class="block text-slate-500">Mulheres</label><input type="number" name="participantes_mulheres" value="0" min="0" class="w-full h-9 px-2 border rounded font-bold"></div>
-                    <div><label class="block text-slate-500">Jovens</label><input type="number" name="participantes_jovens" value="0" min="0" class="w-full h-9 px-2 border rounded font-bold"></div>
-                    <div><label class="block text-slate-500">Crianças</label><input type="number" name="participantes_criancas" value="0" min="0" class="w-full h-9 px-2 border rounded font-bold"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div><label class="block font-semibold text-slate-700 mb-1">Data Real</label><input type="date" name="data_execucao" required class="w-full h-10 px-2 border rounded-xl bg-white"></div>
-                    <div class="flex items-end"><button type="submit" class="w-full h-10 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow cursor-pointer">✅ Concluir Feedback</button></div>
-                </div>
-            </form>
-        </div>
-        {% endif %}
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">📌 Planificar Actividade</h3>
-                <form action="/secretaria/planificacao/nova" method="POST" class="space-y-3.5 text-xs">
-                    <div><label class="block font-semibold mb-1">Departamento</label><select name="departamento" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-bold">{% for op in opcoes.get('departamento', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}</select></div>
-                    <div><label class="block font-semibold mb-1">Tipo de Evento</label><select name="tipo_evento" class="w-full h-10 px-2 border rounded-xl bg-slate-50">{% for op in opcoes.get('tipo_evento', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}</select></div>
-                    <div><label class="block font-semibold mb-1">Nome Actividade *</label><input type="text" name="actividade" required class="w-full h-10 px-3 border rounded-xl bg-slate-50"></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="block font-semibold mb-1">Data Prevista</label><input type="date" name="data_prevista" required class="w-full h-10 px-2 border rounded-xl bg-slate-50"></div>
-                        <div><label class="block font-semibold mb-1">Frequência</label><select name="frequencia" class="w-full h-10 px-2 border rounded-xl bg-slate-50"><option value="Pontual / Única">Pontual / Única</option><option value="Semanal">Semanal</option><option value="Mensal">Mensal</option></select></div>
-                    </div>
-                    <div><label class="block font-semibold mb-1">Responsável</label><input type="text" name="responsavel" class="w-full h-10 px-3 border rounded-xl bg-slate-50"></div>
-                    <button type="submit" class="w-full py-3 bg-indigo-800 hover:bg-indigo-900 text-white font-bold rounded-xl shadow cursor-pointer">Gravar Planificação</button>
-                </form>
-            </div>
-            <div class="lg:col-span-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">📊 Cronograma ({{ planificacoes|length }})</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead><tr class="border-b-2 border-slate-200 text-slate-500"><th class="py-2.5 px-2">Actividade</th><th class="py-2.5 px-2">Data</th><th class="py-2.5 px-2">Status</th><th class="py-2.5 px-2 text-right">Ação</th></tr></thead>
-                        <tbody>
-                            {% for p in planificacoes %}
-                            <tr class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-3 px-2 font-bold text-indigo-900">{{ p.actividade }}<div class="text-[11px] text-slate-500">{{ p.departamento }}</div></td>
-                                <td class="py-3 px-2">{{ p.data_prevista }}</td>
-                                <td class="py-3 px-2">{% if p.status == 'Executado' %}<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">✅ Executado</span>{% else %}<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold">Planeado</span>{% endif %}</td>
-                                <td class="py-3 px-2 text-right">{% if p.status != 'Executado' %}<a href="/?aba=secretaria&relatar_id={{ p.id }}" class="px-2.5 py-1 bg-amber-600 text-white rounded font-bold">📝 Relatar</a>{% else %}<span class="text-emerald-700 font-bold">Concluído</span>{% endif %}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" class="py-8 text-center text-slate-400">Nenhum plano registado.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- ========================================================= -->
-        <!-- ABA 3: CULTOS COM GRELHA DISCRIMINADA COMPLETA            -->
-        <!-- ========================================================= -->
-        {% if aba_ativa == 'cultos' %}
-        <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow mb-6">
-            <h2 class="text-xl font-extrabold">⛪ Registo de Cultos & Estatística Completa de Presenças</h2>
-            <p class="text-xs text-indigo-200 mt-1">Estatística oficial discriminada por género em todas as faixas etárias</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">📝 Lançar Culto</h3>
-                <form action="/cultos/novo" method="POST" class="space-y-3 text-xs">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold mb-1">Data *</label>
-                            <input type="date" name="data_culto" required class="w-full h-10 px-2 border rounded-xl bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="block font-semibold mb-1">Tipo de Culto</label>
-                            <select name="tipo_culto" class="w-full h-10 px-2 border rounded-xl bg-slate-50 font-bold">
-                                {% for op in opcoes.get('tipo_culto', []) %}<option value="{{ op.valor }}">{{ op.valor }}</option>{% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                        <div class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Assistência Discriminada por Género</div>
-                        
-                        <div class="grid grid-cols-2 gap-2">
-                            <div><label class="text-slate-500 font-semibold">👨 Homens Adultos</label><input type="number" name="homens_adultos" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white font-bold"></div>
-                            <div><label class="text-slate-500 font-semibold">👩 Mulheres Adultas</label><input type="number" name="mulheres_adultas" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white font-bold"></div>
-                            <div><label class="text-slate-500 font-semibold">👦 Jovens (Rapazes)</label><input type="number" name="jovens_rapazes" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white font-bold"></div>
-                            <div><label class="text-slate-500 font-semibold">👧 Jovens (Moças)</label><input type="number" name="jovens_mocas" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white font-bold"></div>
-                            
-                            <div class="bg-blue-50/60 p-1.5 rounded-lg border border-blue-200">
-                                <label class="text-blue-900 font-bold text-[11px] block">👶 Crianças (Meninos)</label>
-                                <input type="number" name="criancas_meninos" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border border-blue-300 rounded bg-white font-bold text-blue-900">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1 text-xs">Estado Civil *</label>
+                                    <select name="estado_civil" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Solteiro(a)">Solteiro(a)</option>
+                                        <option value="Casado(a)" selected>Casado(a)</option>
+                                        <option value="Viúvo(a)">Viúvo(a)</option>
+                                        <option value="Divorciado(a)">Divorciado(a)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1 text-xs">Zona Territorial</label>
+                                    <select name="zona" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Zona 1 - Chicuque Sede">Zona 1 - Chicuque Sede</option>
+                                        <option value="Zona 2 - Chambone">Zona 2 - Chambone</option>
+                                        <option value="Zona 3 - Tinga">Zona 3 - Tinga</option>
+                                        <option value="Zona 4 - Rumbana">Zona 4 - Rumbana</option>
+                                        <option value="Zona 5 - Dambo">Zona 5 - Dambo</option>
+                                        <option value="Zona 6 - Macuamene">Zona 6 - Macuamene</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1 text-xs">Célula Familiar</label>
+                                    <select name="celula" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Célula Betel (Chicuque)">Célula Betel (Chicuque)</option>
+                                        <option value="Célula Sião (Chambone)">Célula Sião (Chambone)</option>
+                                        <option value="Célula Peniel (Tinga)">Célula Peniel (Tinga)</option>
+                                        <option value="Célula Ebenézer (Rumbana)">Célula Ebenézer (Rumbana)</option>
+                                        <option value="Célula Jerusalém (Agostinho)">Célula Jerusalém (Agostinho)</option>
+                                        <option value="Célula Manassés (Dambo)">Célula Manassés (Dambo)</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="bg-pink-50/60 p-1.5 rounded-lg border border-pink-200">
-                                <label class="text-pink-900 font-bold text-[11px] block">👧 Crianças (Meninas)</label>
-                                <input type="number" name="criancas_meninas" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border border-pink-300 rounded bg-white font-bold text-pink-900">
-                            </div>
-
-                            <div><label class="text-slate-500">Visitantes (H)</label><input type="number" name="visitantes_homens" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white"></div>
-                            <div><label class="text-slate-500">Visitantes (M)</label><input type="number" name="visitantes_mulheres" value="0" min="0" oninput="somarCulto()" class="campo-soma w-full h-8 px-2 border rounded bg-white"></div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 pt-2 border-t">
-                            <div>
-                                <label class="font-bold text-amber-700">🔥 Vidas no Altar (Apelos)</label>
-                                <input type="number" name="apelos" value="0" min="0" class="w-full h-9 px-2 border-2 border-amber-300 rounded bg-amber-50 font-bold text-center">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1 text-xs">Situação Espiritual / Batismo *</label>
+                                    <select name="baptizado" required class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Sim">Baptizado nas Águas (Comunhão)</option>
+                                        <option value="Não">Não Baptizado (Em Doutrina / Novo)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-700 mb-1 text-xs">Ministério / Departamento</label>
+                                    <select name="departamento" class="w-full h-11 px-3 bg-white border border-slate-300 rounded-xl font-medium text-xs text-slate-800 focus:border-indigo-600 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Membro Geral">Membro Geral</option>
+                                        <option value="Corpo Pastoral / Obreiro">Corpo Pastoral / Obreiro</option>
+                                        <option value="Diaconato">Diaconato</option>
+                                        <option value="Departamento de Senhoras">Departamento de Senhoras</option>
+                                        <option value="Juventude Cristã">Juventude Cristã</option>
+                                        <option value="Escola Dominical / Infantil">Escola Dominical / Infantil</option>
+                                        <option value="Louvor & Coral">Louvor & Coral</option>
+                                    </select>
+                                </div>
                             </div>
                             <div>
-                                <label class="font-bold text-blue-800">📊 Total de Presentes</label>
-                                <input type="number" id="total_presentes" name="total_presentes" value="0" readonly class="w-full h-9 px-2 border-2 border-blue-400 rounded bg-blue-50 font-extrabold text-center text-blue-900 text-sm">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block font-semibold mb-1">Pregador</label><input type="text" name="pregador" placeholder="Nome do Pregador" class="w-full h-10 px-3 border rounded-xl bg-slate-50"></div>
-                        <div><label class="block font-semibold mb-1">Tema / Texto</label><input type="text" name="tema_mensagem" placeholder="Ex: Isaías 40:31" class="w-full h-10 px-3 border rounded-xl bg-slate-50"></div>
-                    </div>
-
-                    <button type="submit" class="w-full py-3 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-xl shadow cursor-pointer">
-                        Gravar Relatório de Culto
-                    </button>
-                </form>
-            </div>
-
-            <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">📚 Histórico de Cultos ({{ cultos|length }})</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead>
-                            <tr class="border-b-2 border-slate-200 text-slate-500">
-                                <th class="py-2.5 px-2">Data</th>
-                                <th class="py-2.5 px-2">Culto & Pregador</th>
-                                <th class="py-2.5 px-2 text-center">Crianças (M/F)</th>
-                                <th class="py-2.5 px-2 text-center">Total</th>
-                                <th class="py-2.5 px-2 text-center">Apelos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for c in cultos %}
-                            <tr class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="py-3 px-2 font-semibold">{{ c.data_culto }}</td>
-                                <td class="py-3 px-2 font-bold text-slate-800">{{ c.tipo_culto }}<div class="text-[11px] text-slate-400">{{ c.pregador or '---' }}</div></td>
-                                <td class="py-3 px-2 text-center font-bold text-slate-600">
-                                    👦 {{ c.criancas_meninos or 0 }} | 👧 {{ c.criancas_meninas or 0 }}
-                                </td>
-                                <td class="py-3 px-2 text-center font-black text-blue-900 bg-blue-50/50 rounded-lg">{{ c.total_presentes }}</td>
-                                <td class="py-3 px-2 text-center font-black text-amber-700">{{ c.apelos }}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="5" class="py-8 text-center text-slate-400">Nenhum culto registado.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- ========================================================= -->
-        <!-- ABA 4: NOVOS CONVERTIDOS                                  -->
-        <!-- ========================================================= -->
-        {% if aba_ativa == 'convertidos' %}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">🌱 Registar Novo Convertido</h3>
-                <form action="/convertidos/novo" method="POST" class="space-y-3.5 text-xs">
-                    <div><label class="block font-semibold mb-1">Nome Completo *</label><input type="text" name="nome" required class="w-full h-11 px-3 border rounded-xl bg-blue-50/50"></div>
-                    <div><label class="block font-semibold mb-1">Contacto</label><input type="text" name="telefone" class="w-full h-11 px-3 border rounded-xl bg-blue-50/50"></div>
-                    <div><label class="block font-semibold mb-1">Data Decisão</label><input type="date" name="data_decisao" required class="w-full h-11 px-3 border rounded-xl bg-white"></div>
-                    <div><label class="block font-semibold mb-1">Bairro</label><input type="text" name="bairro" class="w-full h-11 px-3 border rounded-xl bg-blue-50/50"></div>
-                    <button type="submit" class="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow cursor-pointer">Registar para Discipulado</button>
-                </form>
-            </div>
-            <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 class="font-bold text-base mb-4 border-b pb-2">Acompanhamento Espiritual ({{ convertidos|length }})</h3>
-                <table class="w-full text-left text-xs">
-                    <thead><tr class="border-b-2 border-slate-200 text-slate-500"><th class="py-3 px-3">Nome</th><th class="py-3 px-3">Contacto</th><th class="py-3 px-3">Bairro</th></tr></thead>
-                    <tbody>
-                        {% for c in convertidos %}
-                        <tr class="border-b border-slate-100 hover:bg-slate-50"><td class="py-3 px-3 font-bold">{{ c.nome }}</td><td class="py-3 px-3">{{ c.telefone or '---' }}</td><td class="py-3 px-3">{{ c.bairro or '---' }}</td></tr>
-                        {% else %}
-                        <tr><td colspan="3" class="py-8 text-center text-slate-400">Nenhum convertido registado.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- ========================================================= -->
-        <!-- ABA 5: DASHBOARD FINANCEIRO COMPLETO (RESTAURADA 100%)    -->
-        <!-- ========================================================= -->
-        {% if aba_ativa == 'financas' and (usuario_logado.perfil != 'secretario') %}
-        <div class="bg-emerald-950 text-white p-6 rounded-2xl shadow mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-black">📊 Dashboard Financeiro & Transparência</h2>
-                <p class="text-xs text-emerald-300 mt-1">Visão analítica completa das finanças da congregação (Sede Chicuque)</p>
-            </div>
-            <div class="text-right flex flex-wrap items-center gap-3">
-                <div class="bg-white/10 px-3 py-1.5 rounded-xl border border-white/10 text-right">
-                    <span class="text-[9px] uppercase font-bold text-amber-300 block">💵 Caixa Físico</span>
-                    <span class="text-sm font-black text-white">{{ "%.2f"|format(kpis.saldo_caixa_fisico or 0) }} MT</span>
-                </div>
-                <div class="bg-white/10 px-3 py-1.5 rounded-xl border border-white/10 text-right">
-                    <span class="text-[9px] uppercase font-bold text-blue-300 block">🏦 Conta Bancária</span>
-                    <span class="text-sm font-black text-white">{{ "%.2f"|format(kpis.saldo_banco or 0) }} MT</span>
-                </div>
-                <div>
-                    <span class="text-[10px] uppercase font-bold text-emerald-300 block">Saldo Geral Total</span>
-                    <span class="text-2xl font-black text-white">{{ "%.2f"|format(kpis.saldo_caixa) }} MT</span>
-                </div>
-                {% if usuario_logado.perfil in ['tesoureiro', 'admin'] %}
-                <a href="/?aba=tesouraria" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs shadow flex items-center gap-1.5">
-                    <span>🔐</span><span>Lançamentos</span>
-                </a>
-                <a href="/financas/relatorio-geral" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs shadow flex items-center gap-1.5 transition">
-                    <span>📄</span><span>Baixar Balancete A4 (PDF)</span>
-                </a>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- 3 CARDS ANALÍTICOS SEPARADOS: IGREJA LOCAL, IGREJA MÃE E DEPARTAMENTOS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 text-xs">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <div class="font-extrabold text-slate-800 uppercase flex items-center justify-between border-b pb-2 mb-2">
-                    <span>🏛️ Igreja Geral (Local)</span>
-                    <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold">Chicuque</span>
-                </div>
-                <div class="flex justify-between items-center text-emerald-700 font-bold">
-                    <span>Entradas Locais:</span>
-                    <span>+ {{ "%.2f"|format(kpis.geral_in or 0) }} MT</span>
-                </div>
-                <div class="flex justify-between items-center text-rose-700 font-bold mt-1">
-                    <span>Despesas Locais:</span>
-                    <span>- {{ "%.2f"|format(kpis.geral_out or 0) }} MT</span>
-                </div>
-                <div class="border-t pt-2 mt-2 flex justify-between items-center font-black text-slate-900">
-                    <span>Saldo Operacional:</span>
-                    <span>{{ "%.2f"|format((kpis.geral_in or 0) - (kpis.geral_out or 0)) }} MT</span>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-amber-200 bg-amber-50/30">
-                <div class="font-extrabold text-amber-950 uppercase flex items-center justify-between border-b border-amber-200 pb-2 mb-2">
-                    <span>🏢 Igreja Mãe (Sede)</span>
-                    <span class="text-[10px] bg-amber-200 text-amber-950 px-2 py-0.5 rounded font-black">Remessas</span>
-                </div>
-                <div class="flex justify-between items-center text-blue-800 font-bold">
-                    <span>Apoio Recebido:</span>
-                    <span>+ {{ "%.2f"|format(kpis.mae_in or 0) }} MT</span>
-                </div>
-                <div class="flex justify-between items-center text-rose-700 font-bold mt-1">
-                    <span>Remessas / Dízimo Dízimos:</span>
-                    <span>- {{ "%.2f"|format(kpis.mae_out or 0) }} MT</span>
-                </div>
-                <div class="border-t border-amber-200 pt-2 mt-2 flex justify-between items-center font-black text-amber-950">
-                    <span>Balanço c/ a Sede:</span>
-                    <span>{{ "%.2f"|format((kpis.mae_in or 0) - (kpis.mae_out or 0)) }} MT</span>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-indigo-200 bg-indigo-50/30">
-                <div class="font-extrabold text-indigo-950 uppercase flex items-center justify-between border-b border-indigo-200 pb-2 mb-2">
-                    <span>👥 Departamentos</span>
-                    <span class="text-[10px] bg-indigo-200 text-indigo-950 px-2 py-0.5 rounded font-black">Fundos</span>
-                </div>
-                <div class="flex justify-between items-center text-emerald-700 font-bold">
-                    <span>Arrecadação Deptos:</span>
-                    <span>+ {{ "%.2f"|format(kpis.depto_in or 0) }} MT</span>
-                </div>
-                <div class="flex justify-between items-center text-rose-700 font-bold mt-1">
-                    <span>Gastos Deptos:</span>
-                    <span>- {{ "%.2f"|format(kpis.depto_out or 0) }} MT</span>
-                </div>
-                <div class="border-t border-indigo-200 pt-2 mt-2 flex justify-between items-center font-black text-indigo-950">
-                    <span>Fundo Departamental:</span>
-                    <span>{{ "%.2f"|format((kpis.depto_in or 0) - (kpis.depto_out or 0)) }} MT</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4 CARDS DE RESUMO GERAL -->
-        <div class="grid grid-cols-1 md:grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-emerald-500 border-slate-200">
-                <div class="text-slate-500 text-xs font-bold uppercase">Entradas Totais</div>
-                <div class="text-2xl font-black text-emerald-700 mt-1">+ {{ "%.2f"|format(kpis.total_entradas) }} MT</div>
-                <div class="text-[11px] text-slate-400 mt-1">Dízimos e Ofertas</div>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-rose-500 border-slate-200">
-                <div class="text-slate-500 text-xs font-bold uppercase">Saídas & Despesas</div>
-                <div class="text-2xl font-black text-rose-700 mt-1">- {{ "%.2f"|format(kpis.total_saidas) }} MT</div>
-                <div class="text-[11px] text-slate-400 mt-1">Taxa de consumo: {{ kpis.taxa_gasto }}%</div>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-indigo-500 border-slate-200">
-                <div class="text-slate-500 text-xs font-bold uppercase">Total em Dízimos</div>
-                <div class="text-2xl font-black text-indigo-900 mt-1">{{ "%.2f"|format(kpis.total_dizimos) }} MT</div>
-                <div class="text-[11px] text-slate-400 mt-1">Fidelidade Ministerial</div>
-            </div>
-                        <!-- CARD 4: MISSÕES -->
-            <div class="bg-white p-4.5 rounded-2xl shadow-sm border-l-4 border-amber-500 border-slate-200">
-                <div class="text-slate-500 text-[11px] font-bold uppercase flex items-center justify-between">
-                    <span>🌍 Missões</span>
-                    <span class="text-[9px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-black">Campo</span>
-                </div>
-                <div class="text-xl font-black text-amber-700 mt-1">{{ "%.2f"|format(kpis.total_missoes or 0) }} MT</div>
-                <div class="text-[10px] text-slate-400 mt-1">Evangelismo & Obreiros</div>
-            </div>
-            <!-- CARD 5: CONSTRUÇÃO & OBRAS -->
-            <div class="bg-white p-4.5 rounded-2xl shadow-sm border-l-4 border-cyan-600 border-slate-200">
-                <div class="text-slate-500 text-[11px] font-bold uppercase flex items-center justify-between">
-                    <span>🏗️ Construção</span>
-                    <span class="text-[9px] bg-cyan-100 text-cyan-900 px-1.5 py-0.5 rounded font-black">Obras</span>
-                </div>
-                <div class="text-xl font-black text-cyan-800 mt-1">{{ "%.2f"|format(kpis.total_construcao or 0) }} MT</div>
-                <div class="text-[10px] text-slate-400 mt-1">Infraestrutura do Templo</div>
-            </div>
-                <div class="text-2xl font-black text-amber-700 mt-1">{{ "%.2f"|format(kpis.total_missoes) }} MT</div>
-                <div class="text-[11px] text-slate-400 mt-1">Campanhas e Construção</div>
-            </div>
-        </div>
-
-                <!-- MAPA ANALÍTICO: O QUE ENTROU, O QUE FOI USADO E O QUE SOBROU -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8 space-y-3">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3">
-                <div>
-                    <h3 class="font-extrabold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <span>⚖️</span> Mapa de Reconciliação: Entrou, Usado e Sobrou por Rubrica
-                    </h3>
-                    <p class="text-xs text-slate-500">Transparência detalhada por fonte de arrecadação e aplicação dos fundos</p>
-                </div>
-                <a href="/financas/relatorio-geral" target="_blank" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1">
-                    <span>🖨️</span> Ver Balancete Oficial Completo →
-                </a>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-700 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Fonte / Fundo</th>
-                            <th class="py-2.5 px-3 text-right">Entrou (+)</th>
-                            <th class="py-2.5 px-3 text-right">Foi Usado (-)</th>
-                            <th class="py-2.5 px-3 text-right font-black">Sobrou (=)</th>
-                            <th class="py-2.5 px-3 text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- DÍZIMOS -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                📜 Dízimos Ministeriais
-                                <span class="block text-[10px] text-slate-400 font-normal">Fidelidade e sustento pastoral</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.total_dizimos or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- 0.00 MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format(kpis.total_dizimos or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">POSITIVO</span></td>
-                        </tr>
-                        <!-- OFERTAS GERAIS -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                🏛️ Igreja Geral (Envolve Zonas)
-                                <span class="block text-[10px] text-indigo-700 font-normal">Contribuições gerais e coletas que envolvem as Zonas</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.geral_in or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- {{ "%.2f"|format(kpis.geral_out or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format((kpis.geral_in or 0) - (kpis.geral_out or 0)) }} MT</td>
-                            <td class="py-2.5 px-3 text-center">
-                                {% if (kpis.geral_in or 0) >= (kpis.geral_out or 0) %}
-                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">EQUILIBRADO</span>
-                                {% else %}
-                                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-100 text-rose-800">DÉFICE</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <!-- MISSÕES -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                🌍 Fundo de Missões & Evangelismo
-                                <span class="block text-[10px] text-slate-400 font-normal">Ofertas missionárias e obreiros do campo</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.total_missoes or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- 0.00 MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format(kpis.total_missoes or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800">RESERVADO</span></td>
-                        </tr>
-                        <!-- CONSTRUÇÃO -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                🏗️ Campanha de Construção & Obras
-                                <span class="block text-[10px] text-slate-400 font-normal">Infraestrutura, cimento e tijolos</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.total_construcao or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- 0.00 MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format(kpis.total_construcao or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-cyan-100 text-cyan-800">RESERVADO</span></td>
-                        </tr>
-                        <!-- DEPARTAMENTOS -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                👥 Departamentos (Juventude, EBD, Mães)
-                                <span class="block text-[10px] text-slate-400 font-normal">Arrecadações setoriais</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.depto_in or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- {{ "%.2f"|format(kpis.depto_out or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format((kpis.depto_in or 0) - (kpis.depto_out or 0)) }} MT</td>
-                            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-100 text-indigo-800">DEPARTAMENTAL</span></td>
-                        </tr>
-                        <!-- IGREJA MÃE (SEM AS ZONAS) -->
-                        <tr class="border-b hover:bg-slate-50">
-                            <td class="py-2.5 px-3 font-bold text-slate-900">
-                                🏢 Igreja Mãe (Templo Sede)
-                                <span class="block text-[10px] text-amber-700 font-normal">Exclusivo do templo central (sem incluir as Zonas)</span>
-                            </td>
-                            <td class="py-2.5 px-3 text-right font-bold text-emerald-700">+ {{ "%.2f"|format(kpis.mae_in or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-bold text-rose-700">- {{ "%.2f"|format(kpis.mae_out or 0) }} MT</td>
-                            <td class="py-2.5 px-3 text-right font-black text-indigo-950">{{ "%.2f"|format((kpis.mae_in or 0) - (kpis.mae_out or 0)) }} MT</td>
-                            <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-900">TEMPLO SEDE</span></td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="bg-slate-100 font-black text-xs text-slate-900">
-                            <td class="py-2.5 px-3 uppercase">SALDO TOTAL REMANESCENTE:</td>
-                            <td class="py-2.5 px-3 text-right text-emerald-700">+ {{ "%.2f"|format(kpis.total_entradas) }} MT</td>
-                            <td class="py-2.5 px-3 text-right text-rose-700">- {{ "%.2f"|format(kpis.total_saidas) }} MT</td>
-                            <td class="py-2.5 px-3 text-right text-indigo-950 text-sm">{{ "%.2f"|format(kpis.saldo_caixa) }} MT</td>
-                            <td class="py-2.5 px-3 text-center text-slate-500 font-normal">Consumo: {{ kpis.taxa_gasto }}%</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-            <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">📊 Distribuição por Categoria Financeira</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                {% for cat, val in kpis.categorias_caixa.items() %}
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <div class="flex justify-between items-center mb-1.5 font-bold">
-                        <span class="text-slate-700">{{ cat }}</span>
-                        <span class="text-indigo-950 font-extrabold">{{ "%.2f"|format(val) }} MT</span>
-                    </div>
-                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        {% set perc = (val / kpis.total_entradas * 100)|int if kpis.total_entradas > 0 else 10 %}
-                        <div class="bg-emerald-600 h-2 rounded-full" style="width: {{ [perc, 100]|min }}%"></div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="font-bold text-base mb-4 border-b pb-2">📋 Livro Razão de Movimentos ({{ caixa|length }} registos)</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="border-b-2 border-slate-200 text-slate-500">
-                            <th class="py-2.5 px-2">Data</th>
-                            <th class="py-2.5 px-2">Conta</th>
-                            <th class="py-2.5 px-2">Tipo</th>
-                            <th class="py-2.5 px-2">Categoria & Descrição</th>
-                            <th class="py-2.5 px-2 text-right">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cx in caixa %}
-                        <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="py-3 px-2 text-slate-600">{{ cx.data_movimento }}</td>
-                            <td class="py-3 px-2">
-                                {% if 'banco' in (cx.conta or '')|lower %}
-                                <span class="bg-blue-100 text-blue-900 px-2 py-0.5 rounded font-black text-[10px]">🏦 Banco</span>
-                                {% else %}
-                                <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-black text-[10px]">💵 Caixa</span>
-                                {% endif %}
-                            </td>
-                            <td class="py-3 px-2">
-                                <span class="{% if cx.tipo == 'Entrada' %}bg-emerald-100 text-emerald-800{% else %}bg-rose-100 text-rose-800{% endif %} px-2.5 py-1 rounded-full font-bold text-[11px]">{{ cx.tipo }}</span>
-                            </td>
-                            <td class="py-3 px-2 font-bold">{{ cx.categoria }}<div class="text-[11px] text-slate-400 font-normal">{{ cx.descricao }}</div></td>
-                            <td class="py-3 px-2 text-right font-extrabold {% if cx.tipo == 'Entrada' %}text-emerald-700{% else %}text-rose-700{% endif %}">
-                                {{ "%.2f"|format(cx.valor or 0) }} MT
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="5" class="py-8 text-center text-slate-400">Nenhum movimento gravado.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- ========================================================= -->
-        <!-- ABA 6: CAIXA & TESOURARIA (EXCLUSIVO TESOURARIA E ADMIN)  -->
-        <!-- ========================================================= -->
-        {% if aba_ativa == 'tesouraria' and usuario_logado.perfil in ['tesoureiro', 'admin'] %}
-        <div class="bg-amber-950 text-white p-6 rounded-2xl shadow mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full text-[10px] font-black uppercase mb-1 border border-amber-400/30">
-                    <span>🔐</span> ACESSO RESTRITO • GABINETE DA TESOURARIA
-                </div>
-                <h2 class="text-2xl font-black">Lançamentos de Caixa & Movimentação Financeira</h2>
-                <p class="text-xs text-amber-200 mt-0.5">Gestão separada: Igreja em Geral (Local), Igreja Mãe (Sede) e Departamentos</p>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-white/10 px-3.5 py-2 rounded-xl text-right border border-white/10">
-                    <span class="text-[9px] uppercase font-bold text-amber-300 block">Caixa Físico</span>
-                    <span class="text-sm font-black text-white">{{ "%.2f"|format(kpis.saldo_caixa_fisico or 0) }} MT</span>
-                </div>
-                <div class="bg-white/10 px-3.5 py-2 rounded-xl text-right border border-white/10">
-                    <span class="text-[9px] uppercase font-bold text-blue-300 block">Conta Bancária</span>
-                    <span class="text-sm font-black text-white">{{ "%.2f"|format(kpis.saldo_banco or 0) }} MT</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border-2 border-amber-300">
-                <h3 class="font-extrabold text-base mb-4 border-b pb-2 text-amber-950 flex items-center gap-2">
-                    <span>✍️</span> Lançar Entrada ou Saída de Valores
-                </h3>
-                
-                <form action="/financas/caixa/novo" method="POST" class="space-y-4 text-xs">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Tipo de Movimento *</label>
-                            <select id="tipo_movimento" name="tipo" onchange="atualizarFormularioTesouraria()" class="w-full h-11 px-2 border-2 border-slate-200 rounded-xl bg-slate-50 font-black text-sm">
-                                <option value="Entrada">🟢 Entrada (+)</option>
-                                <option value="Saída">🔴 Saída (-)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Conta Financeira *</label>
-                            <select name="conta" required class="w-full h-11 px-2 border-2 border-slate-200 rounded-xl bg-slate-50 font-black text-xs text-indigo-900">
-                                <option value="Caixa Físico">💵 Caixa Físico (Numerário)</option>
-                                <option value="Conta Bancária">🏦 Conta Bancária</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Âmbito do Movimento (Onde entra / De onde sai) *</label>
-                        <select id="destino_tipo" name="destino_tipo" onchange="atualizarFormularioTesouraria()" class="w-full h-11 px-3 border-2 border-indigo-300 rounded-xl bg-indigo-50/50 font-black text-xs text-indigo-950">
-                            <option value="Igreja Geral">🏛️ 1. Igreja Geral (Inclui Contribuições das Zonas)</option>
-                            <option value="Igreja Mãe">🏢 2. Igreja Mãe (Exclusivo Templo Sede - Sem Zonas)</option>
-                            <option value="Departamento">👥 3. Departamentos da Igreja</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Data da Operação *</label>
-                            <input type="date" name="data_movimento" required class="w-full h-11 px-2 border-2 border-slate-200 rounded-xl bg-slate-50 font-bold">
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Valor (MZN) *</label>
-                            <input type="number" step="0.01" name="valor" required placeholder="Ex: 2500.00" class="w-full h-11 px-3 border-2 border-emerald-400 rounded-xl bg-emerald-50/50 font-black text-emerald-950 text-base">
-                        </div>
-                    </div>
-
-                    <!-- ENTRADA NA IGREJA GERAL -->
-                    <div id="box_entrada_geral" class="space-y-2 p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200">
-                        <div class="p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl space-y-2">
-                            <span class="font-extrabold text-[10px] uppercase text-emerald-900 block tracking-wide">
-                                🟢 CLASSIFICAÇÃO / CATEGORIA DO LANÇAMENTO
-                            </span>
-                            
-
-                    <!-- ENTRADA DA IGREJA MÃE -->
-                    <div id="box_entrada_mae" class="hidden space-y-2 p-3.5 bg-blue-50/70 rounded-xl border border-blue-200">
-                        <div class="font-black text-blue-900 text-[10px] uppercase">Receita Exclusiva da Igreja Mãe (Templo Sede - Sem Zonas)</div>
-                        <label class="block font-semibold text-slate-700 mb-1">Tipo de Entrada da Igreja Mãe *</label>
-                        <select name="categoria_entrada_mae" class="w-full h-10 px-2 border-2 border-blue-300 rounded-xl bg-white font-bold text-blue-950">
-                            {% for op in opcoes.get('categoria_entrada_mae', []) %}
-                            <option value="{{ op.valor }}">{{ op.valor }}</option>
-                            {% else %}
-                            <option value="Apoio / Subsídio da Igreja Mãe">Apoio / Subsídio da Igreja Mãe</option>
-                            <option value="Fundo Missionário da Sede">Fundo Missionário da Sede</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- ENTRADA EM DEPARTAMENTOS -->
-                    <div id="box_entrada_depto" class="hidden space-y-3 p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200">
-                        <div class="font-black text-emerald-900 text-[10px] uppercase">Entrada Destinada ao Departamento</div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Qual Departamento recebe? *</label>
-                            <select name="departamento" class="w-full h-10 px-2 border-2 border-emerald-300 rounded-xl bg-white font-extrabold text-indigo-900">
-                                {% for op in opcoes.get('departamento', []) %}
-                                <option value="{{ op.valor }}">{{ op.valor }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Tipo de Entrada Departamental *</label>
-                            <select name="categoria_entrada_depto" class="w-full h-10 px-2 border rounded-xl bg-white font-semibold">
-                                {% for op in opcoes.get('categoria_entrada_depto', []) %}
-                                <option value="{{ op.valor }}">{{ op.valor }}</option>
-                                {% else %}
-                                <option value="Quotas / Mensalidades do Depto">Quotas / Mensalidades do Depto</option>
-                                <option value="Oferta de Culto do Depto">Oferta de Culto do Depto</option>
-                                <option value="Bazar / Venda do Depto">Bazar / Arrecadação de Fundos</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- SAÍDA DA IGREJA GERAL -->
-                    <div id="box_saida_geral" class="hidden space-y-2 p-3.5 bg-rose-50/70 rounded-xl border border-rose-200">
-                        <div class="font-black text-rose-900 text-[10px] uppercase">Despesas de Funcionamento Local</div>
-                        <label class="block font-bold text-slate-700 mb-1">Selecione a Despesa Local *</label>
-                        <select name="categoria_saida_geral" class="w-full h-10 px-2 border-2 border-slate-300 rounded-xl bg-white font-extrabold text-slate-800">
-                            {% for op in opcoes.get('categoria_saida_geral', []) %}
-                            <option value="{{ op.valor }}">{{ op.valor }}</option>
-                            {% else %}
-                            <option value="Energia (Electricidade / Credelec)">💡 Energia (Electricidade / Credelec)</option>
-                            <option value="Água">🚰 Água</option>
-                            <option value="Vogal (Apoio Pastoral / Transporte)">🚗 Vogal (Subsídio / Apoio Pastoral)</option>
-                            <option value="Santa Ceia (Pão e Vinho)">🍞 Santa Ceia (Pão / Vinho / Elementos)</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- SAÍDA PARA A IGREJA MÃE -->
-                    <div id="box_saida_mae" class="hidden space-y-2 p-3.5 bg-amber-50/70 rounded-xl border-2 border-amber-300">
-                        <div class="font-black text-amber-950 text-[10px] uppercase">Despesas Próprias da Igreja Mãe (Templo Sede - Sem Zonas)</div>
-                        <label class="block font-bold text-amber-900 mb-1">Classificação da Despesa da Igreja Mãe *</label>
-                        <select name="categoria_saida_mae" class="w-full h-10 px-2 border-2 border-amber-400 rounded-xl bg-white font-black text-amber-950 text-xs">
-                            {% for op in opcoes.get('categoria_saida_mae', []) %}
-                            <option value="{{ op.valor }}">{{ op.valor }}</option>
-                            {% else %}
-                            <option value="Dízimo dos Dízimos (Remessa Oficial)">📜 Dízimo dos Dízimos (Remessa Oficial)</option>
-                            <option value="Quota da Sede Provincial">🏢 Quota da Sede Provincial</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- SAÍDA PARA DEPARTAMENTOS -->
-                    <div id="box_saida_depto" class="hidden space-y-3 p-3.5 bg-rose-50/70 rounded-xl border border-rose-200">
-                        <div class="font-black text-rose-900 text-[10px] uppercase">Saída / Fundo Destinado a Departamento</div>
-                        <div>
-                            <label class="block font-bold text-slate-700 mb-1">Qual Departamento recebe o valor? *</label>
-                            <select name="departamento" class="w-full h-10 px-2 border-2 border-rose-300 rounded-xl bg-white font-extrabold text-indigo-900">
-                                {% for op in opcoes.get('departamento', []) %}
-                                <option value="{{ op.valor }}">{{ op.valor }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-rose-900 mb-1">Propósito da Saída (Justificativa Obrigatória) *</label>
-                            <textarea name="proposito" rows="2" placeholder="Ex: Compra de materiais didáticos da EBD / Lanche da vigília..." class="w-full p-2.5 border-2 border-rose-300 rounded-xl bg-white font-medium"></textarea>
-                        </div>
-                    </div>
-
-                    <div>
                         <label class="block font-bold text-slate-700 mb-1">Observações Adicionais / Recibo</label>
                         <input type="text" name="descricao" placeholder="Nº do recibo, beneficiário ou detalhe complementar..." class="w-full h-10 px-3 border rounded-xl bg-slate-50">
                     </div>
