@@ -1,0 +1,270 @@
+import os
+import re
+import py_compile
+import subprocess
+import jinja2
+
+print("=" * 80)
+print("A CRIAR E ATIVAR A SALA DE AULA VIRTUAL (/ensino/aulas)...")
+print("=" * 80)
+
+caminho_app = 'app.py'
+caminho_sala = os.path.join('templates', 'ensino_aulas.html')
+
+# =============================================================================
+# 1. CRIAR TEMPLATE DA SALA DE AULA (templates/ensino_aulas.html)
+# =============================================================================
+html_sala = """<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala Virtual de Ensino & Doutrina • SIGIEAD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- CABEÇALHO DA SALA VIRTUAL -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="/professor" class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 text-lg font-black shadow-inner hover:bg-amber-500/30 transition">
+                    📖
+                </a>
+                <div>
+                    <h1 class="font-black text-sm tracking-tight text-white leading-tight">SIGIEAD • Sala Virtual de Ensino</h1>
+                    <span class="text-[10px] text-amber-400 font-bold block uppercase tracking-wider">Igreja de Chicuque • Doutrina & Discipulado</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/professor" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition border border-slate-700 flex items-center gap-1.5">
+                    <span>←</span>
+                    <span class="hidden sm:inline">Voltar ao Painel</span>
+                </a>
+                <a href="/logout" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
+                    Sair
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- BANNER PEDAGÓGICO -->
+        <div class="bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-lg border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                    <span>🎓</span> Currículo Eclesiástico 2026
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white">
+                    Plano de Aulas: Doutrina & Batismo
+                </h2>
+                <p class="text-xs text-slate-300 max-w-xl">
+                    Material didático e acompanhamento de lições bíblicas para os formandos da classe de discipulado e batismo da Igreja de Chicuque.
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold rounded-xl">
+                    {{ doutrina|length if doutrina else 0 }} Formandos Ativos
+                </span>
+            </div>
+        </div>
+
+        <!-- MÓDULOS E LIÇÕES BÍBLICAS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- COLUNA DA ESQUERDA: LISTA DE LIÇÕES DO CURSO -->
+            <div class="lg:col-span-2 space-y-4">
+                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <span>📚</span> Módulos & Lições do Curso de Doutrina
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Lição 1 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">Lição 1</span>
+                            <span class="text-[10px] text-emerald-600 font-bold">● Fundamental</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">A Salvação em Cristo Jesus</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            O plano da redenção, o arrependimento sincero, a justificação pela fé e a certeza da vida eterna.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: João 3:16 • Romanos 10:9-10 • Efésios 2:8-9
+                        </div>
+                    </div>
+
+                    <!-- Lição 2 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 uppercase">Lição 2</span>
+                            <span class="text-[10px] text-indigo-600 font-bold">● Sacramental</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">O Batismo nas Águas</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Significado bíblico da imersão pública, sepultamento do velho homem e ressurreição para uma nova vida.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: Mateus 28:19 • Romanos 6:3-4 • Atos 2:38
+                        </div>
+                    </div>
+
+                    <!-- Lição 3 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 uppercase">Lição 3</span>
+                            <span class="text-[10px] text-purple-600 font-bold">● Espiritual</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">A Palavra de Deus & Oração</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            A Bíblia Sagrada como única regra de fé e conduta; comunhão diária através da vida devocional.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: 2 Timóteo 3:16-17 • 1 Tessalonicenses 5:17
+                        </div>
+                    </div>
+
+                    <!-- Lição 4 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 uppercase">Lição 4</span>
+                            <span class="text-[10px] text-rose-600 font-bold">● Eclesiástica</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">A Santa Ceia & Comunhão</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Memorial do sacrifício na cruz, comunhão fraterna no corpo de Cristo e preparação espiritual.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: 1 Coríntios 11:23-29 • Lucas 22:19
+                        </div>
+                    </div>
+
+                    <!-- Lição 5 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-teal-100 text-teal-800 uppercase">Lição 5</span>
+                            <span class="text-[10px] text-teal-600 font-bold">● Santificação</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">O Espírito Santo & Fruto</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            O batismo no Espírito Santo, revestimento de poder para testemunhar e a manifestação do fruto.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: Atos 1:8 • Gálatas 5:22-23
+                        </div>
+                    </div>
+
+                    <!-- Lição 6 -->
+                    <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-2 hover:border-amber-400 transition">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">Lição 6</span>
+                            <span class="text-[10px] text-amber-600 font-bold">● Mordomia</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-900">A Igreja Local & Fidelidade</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Membros cooperadores, submissão bíblica pastoral, dízimos, ofertas e envolvimento nos departamentos.
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 text-[11px] font-bold text-slate-400">
+                            📖 Textos: Malaquias 3:10 • Hebreus 13:17
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUNA DA DIREITA: FORMANDOS EM CURSO -->
+            <div class="space-y-4">
+                <h3 class="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <span>👥</span> Alunos Matriculados nesta Classe
+                </h3>
+
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    {% if doutrina and doutrina|length > 0 %}
+                        {% for a in doutrina %}
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs">
+                            <div>
+                                <span class="font-bold text-slate-900 block">{{ a.nome_aluno or a.nome or 'Aluno' }}</span>
+                                <span class="text-[10px] text-indigo-700 font-semibold block">{{ a.classe or 'Discipulado' }} • {{ a.licao_atual or 'Lição 1' }}</span>
+                            </div>
+                            <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-[10px] font-black">
+                                {{ a.presencas or 0 }} Presenças
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-xs text-slate-400 italic text-center py-4">Nenhum formando inscrito no momento.</p>
+                    {% endif %}
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-400/30 p-4 rounded-2xl space-y-2">
+                    <span class="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                        <span>💡</span> Instrução Pedagógica
+                    </span>
+                    <p class="text-[11px] text-amber-900/80 leading-relaxed">
+                        Após ministrar cada lição, atualize as presenças dos formandos diretamente na tabela do seu painel principal para que a secretaria emita os certificados de batismo.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>"""
+
+os.makedirs('templates', exist_ok=True)
+with open(caminho_sala, 'w', encoding='utf-8') as f:
+    f.write(html_sala)
+
+env = jinja2.Environment()
+env.parse(html_sala)
+print("✓ templates/ensino_aulas.html validado com sucesso!")
+
+# =============================================================================
+# 2. REGISTAR A ROTA /ensino/aulas NO APP.PY
+# =============================================================================
+with open(caminho_app, 'r', encoding='utf-8') as f:
+    app_code = f.read()
+
+rota_aulas = '''
+@app.route('/ensino/aulas')
+def sala_aulas_virtual():
+    if not session.get('usuario'):
+        return redirect(url_for('login'))
+    usuario = session.get('usuario')
+    try:
+        doutrina = consultar_todos("SELECT * FROM doutrina ORDER BY id DESC")
+    except Exception:
+        doutrina = []
+    return render_template('ensino_aulas.html',
+                           usuario_logado=usuario,
+                           doutrina=doutrina)
+'''
+
+if "@app.route('/ensino/aulas')" not in app_code:
+    app_code = app_code.rstrip() + "\n\n" + rota_aulas + "\n"
+    print("✓ Rota @app.route('/ensino/aulas') adicionada a app.py!")
+
+with open(caminho_app, 'w', encoding='utf-8') as f:
+    f.write(app_code)
+
+py_compile.compile(caminho_app, doraise=True)
+print("✓ app.py validado e compilado com ZERO erros!")
+
+# =============================================================================
+# 3. ENVIAR PARA O GITHUB E RENDER
+# =============================================================================
+print("=" * 80)
+print("A ENVIAR ATUALIZAÇÃO PARA O RENDER...")
+print("=" * 80)
+
+subprocess.run(["git", "add", "app.py", "templates/ensino_aulas.html"])
+subprocess.run(["git", "commit", "-m", "Ativar sala virtual de aulas em /ensino/aulas"])
+subprocess.run(["git", "push", "origin", "main"])
+
+print("=" * 80)
+print(">>> SALA DE AULA PUBLICADA COM SUCESSO NO RENDER! <<<")
+print("=" * 80)
