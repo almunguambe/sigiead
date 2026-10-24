@@ -2613,5 +2613,187 @@
     }
     </script>
 
+
+<!-- ================= MODAL DE RESUMO DO FORMANDO (HISTÓRICO DINÂMICO) ================= -->
+<div id="modalResumoDoutrina" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+    <div class="bg-[#10141e] text-slate-100 rounded-[28px] max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-800 relative space-y-4 max-h-[92vh] overflow-y-auto no-scrollbar">
+        
+        <!-- Botão Fechar -->
+        <button type="button" onclick="fecharModalResumoDoutrina()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center font-bold text-lg transition">
+            &times;
+        </button>
+
+        <!-- Cabeçalho do Formando -->
+        <div class="flex items-start gap-3 pr-8">
+            <div id="mResumoAvatar" class="w-12 h-12 rounded-2xl bg-blue-700 text-white font-black text-xl flex items-center justify-center shrink-0 shadow-md">
+                C
+            </div>
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h3 id="mResumoNome" class="text-base font-extrabold text-white leading-tight truncate">
+                        Nome do Formando
+                    </h3>
+                    <span id="mResumoSituacao" class="border border-amber-500/60 text-amber-400 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                        EM FORMAÇÃO
+                    </span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1 leading-snug">
+                    Classe: <span id="mResumoClasse" class="text-slate-300 font-semibold">Batismo</span> • Instrutor: <span id="mResumoInstrutor" class="text-slate-300 font-semibold">Anselmo Leonardo Munguambe</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Métricas Rápidas (Grid 2x2) -->
+        <div class="grid grid-cols-2 gap-2 text-center pt-1">
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">ÚLTIMO ACESSO</span>
+                <span id="mResumoAcesso" class="text-xs font-black text-white mt-0.5 block">Hoje</span>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">LIÇÃO ATUAL</span>
+                <span id="mResumoLicaoAtual" class="text-xs font-black text-white mt-0.5 block">Lição 2 de 6</span>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">APROVEITAMENTO</span>
+                <span id="mResumoAproveitamento" class="text-xs font-black text-white mt-0.5 block">100%</span>
+            </div>
+            <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">PRESENÇAS</span>
+                <span id="mResumoPresencas" class="text-xs font-black text-white mt-0.5 block">1 Aulas</span>
+            </div>
+        </div>
+
+        <!-- Discriminação do Plano de Ensino -->
+        <div class="space-y-2 pt-2 border-t border-slate-800/80">
+            <div class="flex items-center justify-between text-xs font-black">
+                <span class="uppercase tracking-wider text-slate-300 flex items-center gap-1.5 text-[11px]">
+                    <span>📖</span> <span>DISCRIMINAÇÃO DO PLANO DE ENSINO (6 LIÇÕES)</span>
+                </span>
+                <span id="mResumoPct" class="text-amber-400 text-[11px]">16% Concluído</span>
+            </div>
+
+            <!-- Lista Dinâmica das 6 Lições -->
+            <div id="mResumoListaLicoes" class="space-y-2">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </div>
+
+        <div class="pt-2">
+            <a id="mResumoLinkEstudos" href="/estudos" class="w-full py-2.5 bg-blue-700 hover:bg-blue-600 text-white font-bold text-xs rounded-xl text-center block shadow transition">
+                Abrir Sala de Aula / Lições deste Aluno →
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const CURRICULO_6_LICOES = [
+    { num: 1, titulo: "O Pecado e o Perdão", sub: "Errar o alvo e expiação pela cruz" },
+    { num: 2, titulo: "Salvação e Senhorio de Cristo", sub: "Novo nascimento e senhorio de Jesus" },
+    { num: 3, titulo: "O Testemunho", sub: "Virtude do Espírito Santo e conduta prática" },
+    { num: 4, titulo: "A Pessoa de Deus Triuno", sub: "Trindade divina e atributos divinos" },
+    { num: 5, titulo: "A Pessoa de Jesus Cristo", sub: "Divindade, ministério tríplice e ressurreição" },
+    { num: 6, titulo: "A Bíblia – Manual de Fé", sub: "Inspiração de Deus e 66 livros canónicos" }
+];
+
+function abrirModalResumoDoutrina(aluno) {
+    if (!aluno) return;
+
+    const modal = document.getElementById('modalResumoDoutrina');
+    if (!modal) return;
+
+    // 1. Dados básicos
+    const nome = aluno.nome_aluno || aluno.nome || 'Formando';
+    const inicial = nome.trim().charAt(0).toUpperCase() || 'A';
+    const classe = aluno.classe || 'Batismo';
+    const instrutor = aluno.professor || 'Anselmo Leonardo Munguambe';
+    const situacao = aluno.situacao || 'EM FORMAÇÃO';
+    const presencas = parseInt(aluno.presencas || 0);
+    const aproveitamento = aluno.aproveitamento || (presencas > 0 ? '100%' : '0%');
+    const acesso = aluno.ultimo_acesso || 'Hoje';
+
+    // 2. Extrair número da lição atual
+    let licaoStr = String(aluno.licao_atual || 'Lição 1');
+    let match = licaoStr.match(/\d+/);
+    let numLicao = match ? parseInt(match[0]) : 1;
+    let numEfetivo = Math.max(numLicao, (presencas > 0 ? presencas + 1 : 1));
+    if (numEfetivo > 6) numEfetivo = 6;
+
+    let concluidas = numEfetivo - 1;
+    let pct = Math.round((concluidas / 6) * 100);
+
+    // 3. Preencher cabeçalho e métricas
+    document.getElementById('mResumoAvatar').innerText = inicial;
+    document.getElementById('mResumoNome').innerText = nome;
+    document.getElementById('mResumoSituacao').innerText = situacao.toUpperCase();
+    document.getElementById('mResumoClasse').innerText = classe;
+    document.getElementById('mResumoInstrutor').innerText = instrutor;
+    document.getElementById('mResumoAcesso').innerText = acesso;
+    document.getElementById('mResumoLicaoAtual').innerText = `Lição ${numEfetivo} de 6`;
+    document.getElementById('mResumoAproveitamento').innerText = aproveitamento;
+    document.getElementById('mResumoPresencas').innerText = `${presencas} Aulas`;
+    document.getElementById('mResumoPct').innerText = `${pct}% Concluído`;
+
+    const linkEstudos = document.getElementById('mResumoLinkEstudos');
+    if (linkEstudos) {
+        linkEstudos.href = `/estudos?aluno_id=${aluno.id || ''}`;
+    }
+
+    // 4. Renderizar a discriminação das 6 lições
+    const containerLicoes = document.getElementById('mResumoListaLicoes');
+    let htmlLicoes = '';
+
+    CURRICULO_6_LICOES.forEach(l => {
+        if (l.num < numEfetivo) {
+            // Concluída
+            htmlLicoes += `
+                <div class="p-3 rounded-2xl bg-slate-900/50 border border-slate-800/90 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-slate-200 block">Lição ${l.num}: ${l.titulo}</span>
+                        <span class="text-[10px] text-emerald-400 font-semibold block mt-0.5">${l.sub}</span>
+                    </div>
+                    <span class="text-xs font-bold text-emerald-400 shrink-0 ml-2">✓ Concluída</span>
+                </div>
+            `;
+        } else if (l.num === numEfetivo) {
+            // Em Curso
+            htmlLicoes += `
+                <div class="p-3 rounded-2xl bg-amber-950/20 border border-amber-500/70 ring-1 ring-amber-400/40 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-amber-300 block">Lição ${l.num}: ${l.titulo}</span>
+                        <span class="text-[10px] text-amber-300/80 font-semibold block mt-0.5">${l.sub}</span>
+                    </div>
+                    <span class="text-xs font-bold text-amber-400 shrink-0 ml-2">• Em Curso</span>
+                </div>
+            `;
+        } else {
+            // Pendente
+            htmlLicoes += `
+                <div class="p-3 rounded-2xl bg-slate-900/30 border border-slate-800/50 flex items-center justify-between text-xs opacity-60">
+                    <div>
+                        <span class="font-bold text-slate-400 block">Lição ${l.num}: ${l.titulo}</span>
+                        <span class="text-[10px] text-slate-500 block mt-0.5">${l.sub}</span>
+                    </div>
+                    <span class="text-xs font-bold text-slate-500 shrink-0 ml-2">Pendente</span>
+                </div>
+            `;
+        }
+    });
+
+    containerLicoes.innerHTML = htmlLicoes;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function fecharModalResumoDoutrina() {
+    const modal = document.getElementById('modalResumoDoutrina');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+</script>
+
 </body>
 </html>
